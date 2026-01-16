@@ -1,23 +1,48 @@
 # Hatch Mini App
 
-Mini app для отображения статистики вылупления яиц в Telegram боте @tohatchbot.
+Beautiful mini app for viewing egg hatching statistics in Telegram bot @tohatchbot.
 
-## Установка
+## Design
 
-1. Склонируйте репозиторий
-2. Настройте GitHub Pages для хостинга
-3. Обновите API_URL в `app.js` на ваш endpoint
+Inspired by [wallet.tg](https://wallet.tg/) and [ton.org](https://ton.org/en) with modern, clean interface.
 
-## Структура
+## Deployment
 
-- `index.html` - главная страница mini app
-- `styles.css` - стили в стиле wallet.tg/top.co/ton.org
-- `app.js` - логика загрузки статистики
-- `api/stats` - API endpoint для получения статистики (нужно настроить)
+### Vercel
 
-## GitHub Pages
+1. Install Vercel CLI:
+```bash
+npm i -g vercel
+```
 
-Для публикации на GitHub Pages:
-1. Создайте репозиторий `tohatchbot/hatch`
-2. Включите GitHub Pages в настройках репозитория
-3. Выберите папку с файлами как источник
+2. Deploy:
+```bash
+vercel
+```
+
+Or connect your GitHub repository to Vercel for automatic deployments.
+
+### Environment Variables
+
+Set `API_URL` environment variable in Vercel to point to your API endpoint:
+```
+API_URL=https://your-api-server.com/api/stats
+```
+
+## Features
+
+- Real-time statistics
+- Beautiful animations
+- Responsive design
+- Telegram WebApp integration
+- Dark theme matching Telegram
+
+## API
+
+The app expects an API endpoint that returns:
+```json
+{
+  "hatched_by_me": 10,
+  "my_eggs_hatched": 5
+}
+```

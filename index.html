@@ -1,42 +1,50 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hatch Stats - Your Egg Hatching Statistics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Hatch - Your Egg Hatching Stats</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">🥚</div>
-            <h1>Hatch Stats</h1>
+    <div class="app-container">
+        <div class="header-section">
+            <div class="logo-container">
+                <div class="logo-emoji">🥚</div>
+            </div>
+            <h1 class="main-title">Hatch</h1>
             <p class="subtitle">Your egg hatching statistics</p>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card hatched">
-                <div class="stat-icon">🐣</div>
-                <div class="stat-content">
-                    <div class="stat-label">Вылупил чужих</div>
-                    <div class="stat-value" id="hatched-count">0</div>
+        <div class="stats-container">
+            <div class="stat-card hatched-card">
+                <div class="stat-header">
+                    <div class="stat-icon">🐣</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Hatched</div>
+                        <div class="stat-value" id="hatched-count">0</div>
+                    </div>
                 </div>
+                <div class="stat-description">Eggs you've hatched</div>
             </div>
 
-            <div class="stat-card received">
-                <div class="stat-icon">🥚</div>
-                <div class="stat-content">
-                    <div class="stat-label">Твоих вылупили</div>
-                    <div class="stat-value" id="my-eggs-count">0</div>
+            <div class="stat-card received-card">
+                <div class="stat-header">
+                    <div class="stat-icon">🥚</div>
+                    <div class="stat-info">
+                        <div class="stat-label">Your Eggs</div>
+                        <div class="stat-value" id="my-eggs-count">0</div>
+                    </div>
                 </div>
+                <div class="stat-description">Your eggs hatched by others</div>
             </div>
         </div>
 
         <div class="info-section">
             <div class="info-card">
-                <h3>Как это работает?</h3>
-                <p>Отправляй яйца через @tohatchbot в любом чате. Только получатели могут вылупить твои яйца!</p>
+                <h3>How it works</h3>
+                <p>Send eggs through @tohatchbot in any chat. Only recipients can hatch your eggs!</p>
             </div>
         </div>
 
