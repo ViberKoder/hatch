@@ -294,6 +294,12 @@ body::before {
     border-radius: 14px;
 }
 
+.task-icon-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .task-info {
     flex: 1;
 }
