@@ -3,9 +3,9 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
-// Set theme colors
-tg.setHeaderColor('#0a0e27');
-tg.setBackgroundColor('#0a0e27');
+// Set theme colors - white theme
+tg.setHeaderColor('#ffffff');
+tg.setBackgroundColor('#ffffff');
 
 // Get user ID from Telegram or URL
 function getUserID() {
@@ -24,8 +24,9 @@ function getUserID() {
     return null;
 }
 
-// API endpoint - update this to your backend
-const API_URL = process.env.API_URL || 'https://your-api-server.com/api/stats';
+// API endpoint - get from environment or use default
+// For Vercel, this should be set as environment variable
+const API_URL = process.env.API_URL || window.API_URL || 'https://your-api-server.com/api/stats';
 
 // Load statistics
 async function loadStats() {
@@ -35,6 +36,7 @@ async function loadStats() {
     const userId = getUserID();
     
     if (!userId) {
+        console.warn('No user ID found');
         hatchedCountEl.textContent = '0';
         myEggsCountEl.textContent = '0';
         return;
@@ -45,14 +47,25 @@ async function loadStats() {
     myEggsCountEl.innerHTML = '<span class="loading"></span>';
     
     try {
-        const response = await fetch(`${API_URL}?user_id=${userId}`);
+        console.log(`Fetching stats from: ${API_URL}?user_id=${userId}`);
+        const response = await fetch(`${API_URL}?user_id=${userId}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        });
+        
+        console.log('Response status:', response.status);
         
         if (response.ok) {
             const data = await response.json();
+            console.log('Stats data:', data);
             animateValue(hatchedCountEl, 0, data.hatched_by_me || 0, 1000);
             animateValue(myEggsCountEl, 0, data.my_eggs_hatched || 0, 1000);
         } else {
-            throw new Error('Failed to load stats');
+            const errorText = await response.text();
+            console.error('API error:', response.status, errorText);
+            throw new Error(`Failed to load stats: ${response.status}`);
         }
     } catch (error) {
         console.error('Error loading stats:', error);
@@ -77,9 +90,21 @@ function animateValue(element, start, end, duration) {
     window.requestAnimationFrame(step);
 }
 
+// Handle Send Egg button
+function setupSendEggButton() {
+    const sendEggBtn = document.getElementById('send-egg-btn');
+    if (sendEggBtn) {
+        sendEggBtn.addEventListener('click', () => {
+            // Open inline mode in Telegram
+            tg.openLink('https://t.me/tohatchbot?start=egg', { try_instant_view: false });
+        });
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadStats();
+    setupSendEggButton();
     
     // Handle back button
     tg.BackButton.onClick(() => {

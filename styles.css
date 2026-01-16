@@ -5,26 +5,25 @@
 }
 
 :root {
-    --bg-primary: #0a0e27;
-    --bg-secondary: #1a1f3a;
-    --bg-card: rgba(255, 255, 255, 0.05);
-    --bg-card-hover: rgba(255, 255, 255, 0.08);
-    --border-color: rgba(255, 255, 255, 0.1);
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --text-tertiary: rgba(255, 255, 255, 0.5);
-    --accent-yellow: #ffd700;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-card: #ffffff;
+    --border-color: #e5e7eb;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-tertiary: #9ca3af;
     --accent-blue: #0088cc;
     --accent-green: #00d4aa;
+    --accent-yellow: #ffd700;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     --gradient-primary: linear-gradient(135deg, #0088cc 0%, #00d4aa 100%);
     --gradient-yellow: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.2);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.3);
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
@@ -57,7 +56,7 @@ body {
 /* Header */
 .header-section {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
     padding-top: 20px;
 }
 
@@ -84,10 +83,7 @@ body {
     font-size: 36px;
     font-weight: 700;
     margin-bottom: 8px;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--text-primary);
     letter-spacing: -0.5px;
 }
 
@@ -102,17 +98,16 @@ body {
     display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 }
 
 .stat-card {
     background: var(--bg-card);
-    backdrop-filter: blur(20px);
     border: 1px solid var(--border-color);
-    border-radius: 24px;
-    padding: 24px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: var(--shadow-md);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
     position: relative;
     overflow: hidden;
 }
@@ -123,25 +118,20 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    height: 2px;
+    height: 3px;
     background: var(--gradient-primary);
     opacity: 0;
-    transition: opacity 0.3s;
+    transition: opacity 0.2s;
 }
 
 .stat-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: var(--shadow-lg);
-    background: var(--bg-card-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-blue);
 }
 
 .stat-card:hover::before {
     opacity: 1;
-}
-
-.hatched-card::before {
-    background: var(--gradient-primary);
 }
 
 .received-card::before {
@@ -156,14 +146,14 @@ body {
 }
 
 .stat-icon {
-    font-size: 40px;
-    width: 64px;
-    height: 64px;
+    font-size: 36px;
+    width: 56px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
     flex-shrink: 0;
 }
 
@@ -173,7 +163,7 @@ body {
 
 .stat-label {
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     margin-bottom: 4px;
     text-transform: uppercase;
@@ -181,28 +171,66 @@ body {
 }
 
 .stat-value {
-    font-size: 32px;
+    font-size: 28px;
     font-weight: 700;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--accent-blue);
     line-height: 1;
 }
 
 .received-card .stat-value {
-    background: var(--gradient-yellow);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #f59e0b;
 }
 
 .stat-description {
     color: var(--text-tertiary);
-    font-size: 13px;
+    font-size: 12px;
     margin-top: 8px;
     padding-top: 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Actions Section */
+.actions-section {
+    margin-bottom: 24px;
+}
+
+.action-button {
+    width: 100%;
+    padding: 16px 24px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.action-button.primary {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.action-button.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.action-button.primary:active {
+    transform: translateY(0);
+}
+
+.button-icon {
+    font-size: 20px;
+}
+
+.button-text {
+    font-weight: 600;
 }
 
 /* Info Section */
@@ -211,18 +239,17 @@ body {
 }
 
 .info-card {
-    background: var(--bg-card);
-    backdrop-filter: blur(20px);
+    background: var(--bg-secondary);
     border: 1px solid var(--border-color);
-    border-radius: 24px;
-    padding: 24px;
-    box-shadow: var(--shadow-md);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
 }
 
 .info-card h3 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     color: var(--text-primary);
 }
 
@@ -241,7 +268,7 @@ body {
 }
 
 .footer p {
-    opacity: 0.6;
+    opacity: 0.7;
 }
 
 /* Loading */
@@ -249,7 +276,7 @@ body {
     display: inline-block;
     width: 16px;
     height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid var(--border-color);
     border-radius: 50%;
     border-top-color: var(--accent-blue);
     animation: spin 0.8s linear infinite;
@@ -275,7 +302,7 @@ body {
     }
     
     .stat-value {
-        font-size: 36px;
+        font-size: 32px;
     }
 }
 
@@ -289,7 +316,7 @@ body {
     }
     
     .stat-value {
-        font-size: 40px;
+        font-size: 36px;
     }
 }
 
