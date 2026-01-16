@@ -30,10 +30,11 @@ const API_URL = 'https://web-production-11ef2.up.railway.app/api/stats';
 // Log for debugging
 console.log('API URL:', API_URL);
 
-// Load statistics
+// Load statistics and points
 async function loadStats() {
     const hatchedCountEl = document.getElementById('hatched-count');
     const myEggsCountEl = document.getElementById('my-eggs-count');
+    const eggPointsEl = document.getElementById('egg-points');
     
     const userId = getUserID();
     
@@ -41,12 +42,14 @@ async function loadStats() {
         console.warn('No user ID found');
         hatchedCountEl.textContent = '0';
         myEggsCountEl.textContent = '0';
+        eggPointsEl.textContent = '0';
         return;
     }
     
     // Show loading
     hatchedCountEl.innerHTML = '<span class="loading"></span>';
     myEggsCountEl.innerHTML = '<span class="loading"></span>';
+    eggPointsEl.innerHTML = '<span class="loading"></span>';
     
     try {
         console.log(`Fetching stats from: ${API_URL}?user_id=${userId}`);
@@ -64,6 +67,10 @@ async function loadStats() {
             console.log('Stats data:', data);
             animateValue(hatchedCountEl, 0, data.hatched_by_me || 0, 1000);
             animateValue(myEggsCountEl, 0, data.my_eggs_hatched || 0, 1000);
+            animateValue(eggPointsEl, 0, data.egg_points || 0, 1000);
+            
+            // Update task status
+            updateTaskStatus(data.tasks || {});
         } else {
             const errorText = await response.text();
             console.error('API error:', response.status, errorText);
@@ -73,6 +80,20 @@ async function loadStats() {
         console.error('Error loading stats:', error);
         hatchedCountEl.textContent = '0';
         myEggsCountEl.textContent = '0';
+        eggPointsEl.textContent = '0';
+    }
+}
+
+// Update task status
+function updateTaskStatus(tasks) {
+    const subscribeButton = document.getElementById('subscribe-button');
+    const subscribeTask = document.getElementById('task-subscribe');
+    
+    if (tasks.subscribed_to_cocoin) {
+        subscribeButton.textContent = 'Subscribed ✓';
+        subscribeButton.classList.add('completed');
+        subscribeButton.disabled = true;
+        subscribeTask.style.opacity = '0.7';
     }
 }
 
@@ -103,10 +124,55 @@ function setupSendEggButton() {
     }
 }
 
+// Setup subscribe button
+function setupSubscribeButton() {
+    const subscribeButton = document.getElementById('subscribe-button');
+    if (subscribeButton) {
+        subscribeButton.addEventListener('click', () => {
+            // Open Cocoin channel
+            tg.openTelegramLink('https://t.me/cocoin');
+            
+            // Check subscription after a delay
+            setTimeout(() => {
+                checkSubscription();
+            }, 2000);
+        });
+    }
+}
+
+// Check subscription status
+async function checkSubscription() {
+    const userId = getUserID();
+    if (!userId) return;
+    
+    try {
+        const response = await fetch(`${API_URL.replace('/api/stats', '')}/api/stats/check_subscription?user_id=${userId}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.subscribed) {
+                // Reload stats to update points
+                loadStats();
+                tg.showAlert('You earned 333 Egg points! 🎉');
+            } else {
+                tg.showAlert('Please subscribe to @cocoin channel first');
+            }
+        }
+    } catch (error) {
+        console.error('Error checking subscription:', error);
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadStats();
     setupSendEggButton();
+    setupSubscribeButton();
     
     // Handle back button
     tg.BackButton.onClick(() => {

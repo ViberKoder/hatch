@@ -320,6 +320,182 @@ body {
     }
 }
 
+/* GIF Container */
+.gif-container {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.main-gif {
+    max-width: 100%;
+    height: auto;
+    max-height: 300px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+}
+
+/* Points Section */
+.points-section {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 20px;
+    background: var(--gradient-yellow);
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+}
+
+.points-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.7);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.points-value {
+    font-size: 48px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1;
+}
+
+/* Points Info */
+.points-info {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.points-info ul {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+}
+
+.points-info li {
+    padding: 4px 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* More Egg Section */
+.more-egg-section {
+    margin-top: 40px;
+    margin-bottom: 32px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.tasks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.task-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-blue);
+}
+
+.task-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.task-icon {
+    font-size: 36px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.task-info {
+    flex: 1;
+}
+
+.task-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.task-reward {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-yellow);
+    background: var(--gradient-yellow);
+    padding: 4px 12px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.task-description {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.task-button {
+    width: 100%;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--gradient-primary);
+    color: white;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.task-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.task-button:active {
+    transform: translateY(0);
+}
+
+.task-button.completed {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+.task-button.completed::after {
+    content: " ✓";
+    color: var(--accent-green);
+}
+
 /* Telegram WebApp specific */
 body {
     background-color: var(--bg-primary);

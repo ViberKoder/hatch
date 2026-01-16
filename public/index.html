@@ -12,11 +12,13 @@
 <body>
     <div class="app-container">
         <div class="header-section">
-            <div class="logo-container">
-                <div class="logo-emoji">🥚</div>
+            <div class="gif-container">
+                <img src="https://s4.ezgif.com/tmp/ezgif-4ab44646530a1823.gif" alt="Egg Animation" class="main-gif">
             </div>
-            <h1 class="main-title">Hatch</h1>
-            <p class="subtitle">Your egg hatching statistics</p>
+            <div class="points-section">
+                <div class="points-label">Egg</div>
+                <div class="points-value" id="egg-points">0</div>
+            </div>
         </div>
 
         <div class="stats-container">
@@ -54,6 +56,30 @@
             <div class="info-card">
                 <h3>How it works</h3>
                 <p>Send eggs through @tohatchbot in any chat. Only recipients can hatch your eggs!</p>
+                <div class="points-info">
+                    <p><strong>Earn Egg points:</strong></p>
+                    <ul>
+                        <li>+2 Egg when someone hatches your egg</li>
+                        <li>+1 Egg when you hatch someone's egg</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="more-egg-section" id="more-egg-section">
+            <h2 class="section-title">More Egg</h2>
+            <div class="tasks-container">
+                <div class="task-card" id="task-subscribe">
+                    <div class="task-header">
+                        <div class="task-icon">📢</div>
+                        <div class="task-info">
+                            <div class="task-title">Subscribe to Cocoin</div>
+                            <div class="task-reward">+333 Egg</div>
+                        </div>
+                    </div>
+                    <div class="task-description">Subscribe to @cocoin channel to earn 333 Egg points</div>
+                    <button class="task-button" id="subscribe-button">Subscribe</button>
+                </div>
             </div>
         </div>
 
