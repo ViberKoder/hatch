@@ -96,11 +96,11 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('https://lime-gigantic-quelea-995.mypinata.cloud/ipfs/bafybeiekv2cuwv66lwcwptftrmubt6wqm55rgjcrrqsrevahhkiamjhxoi');
+    background-image: url('https://static.tildacdn.com/tild3534-6332-4335-b263-313939343466/Screenshot_2026-01-1.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 1;
+    opacity: 0.85;
     z-index: 0;
     pointer-events: none;
 }
