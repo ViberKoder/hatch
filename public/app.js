@@ -69,8 +69,8 @@ async function loadStats() {
             animateValue(myEggsCountEl, 0, data.my_eggs_hatched || 0, 1000);
             animateValue(eggPointsEl, 0, data.egg_points || 0, 1000);
             
-            // Update task status
-            updateTaskStatus(data.tasks || {});
+            // Update task status and progress
+            updateTaskStatus(data.tasks || {}, data);
         } else {
             const errorText = await response.text();
             console.error('API error:', response.status, errorText);
@@ -85,7 +85,8 @@ async function loadStats() {
 }
 
 // Update task status
-function updateTaskStatus(tasks) {
+function updateTaskStatus(tasks, data) {
+    // Subscribe task
     const subscribeButton = document.getElementById('subscribe-button');
     const subscribeTask = document.getElementById('task-subscribe');
     
@@ -94,6 +95,54 @@ function updateTaskStatus(tasks) {
         subscribeButton.classList.add('completed');
         subscribeButton.disabled = true;
         subscribeTask.style.opacity = '0.7';
+    }
+    
+    // Hatch 100 egg task
+    const hatch100Button = document.getElementById('hatch-100-button');
+    const hatch100Task = document.getElementById('task-hatch-100');
+    const hatchProgress = document.getElementById('hatch-progress');
+    const hatchedCount = data.hatched_by_me || 0;
+    
+    if (hatchProgress) {
+        hatchProgress.textContent = `${Math.min(hatchedCount, 100)} / 100`;
+    }
+    
+    if (tasks.hatch_100_eggs) {
+        hatch100Button.textContent = 'Completed ✓';
+        hatch100Button.classList.add('completed');
+        hatch100Button.disabled = true;
+        hatch100Task.style.opacity = '0.7';
+    } else if (hatchedCount >= 100) {
+        hatch100Button.textContent = 'Claim Reward';
+        hatch100Button.disabled = false;
+        hatch100Button.classList.remove('completed');
+    } else {
+        hatch100Button.textContent = 'In Progress';
+        hatch100Button.disabled = true;
+    }
+    
+    // Send 100 egg task
+    const send100Button = document.getElementById('send-100-button');
+    const send100Task = document.getElementById('task-send-100');
+    const sendProgress = document.getElementById('send-progress');
+    const sentCount = data.eggs_sent || 0;
+    
+    if (sendProgress) {
+        sendProgress.textContent = `${Math.min(sentCount, 100)} / 100`;
+    }
+    
+    if (tasks.send_100_eggs) {
+        send100Button.textContent = 'Completed ✓';
+        send100Button.classList.add('completed');
+        send100Button.disabled = true;
+        send100Task.style.opacity = '0.7';
+    } else if (sentCount >= 100) {
+        send100Button.textContent = 'Claim Reward';
+        send100Button.disabled = false;
+        send100Button.classList.remove('completed');
+    } else {
+        send100Button.textContent = 'In Progress';
+        send100Button.disabled = true;
     }
 }
 
