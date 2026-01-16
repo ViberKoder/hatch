@@ -25,22 +25,11 @@ function getUserID() {
 }
 
 // API endpoint
-// In Vercel Settings → Environment Variables, set:
+// TODO: Замените на ваш Railway API URL!
+// В Vercel Settings → Environment Variables установите:
 // API_URL = https://your-railway-app.railway.app/api/stats
-// The build script will inject this into the page
-const API_URL = (() => {
-    // Check if API_URL was injected by build script
-    if (window.API_URL && window.API_URL !== '{{API_URL}}') {
-        return window.API_URL;
-    }
-    // Fallback - try to get from script tag
-    const scriptTag = document.querySelector('script[data-api-url]');
-    if (scriptTag) {
-        return scriptTag.getAttribute('data-api-url');
-    }
-    // Default fallback
-    return 'https://your-api-server.com/api/stats';
-})();
+// Или обновите эту строку напрямую:
+const API_URL = 'https://your-railway-app.railway.app/api/stats';
 
 // Log for debugging
 console.log('API URL:', API_URL);
