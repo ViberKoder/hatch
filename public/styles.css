@@ -96,11 +96,11 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('https://web.telegram.org/a/chat-bg-br.3b09afa867133135546b.png');
+    background-image: url('https://lime-gigantic-quelea-995.mypinata.cloud/ipfs/bafybeiekv2cuwv66lwcwptftrmubt6wqm55rgjcrrqsrevahhkiamjhxoi');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.1;
+    opacity: 1;
     z-index: 0;
     pointer-events: none;
 }
