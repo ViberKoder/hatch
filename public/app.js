@@ -118,8 +118,8 @@ function setupSendEggButton() {
     const sendEggBtn = document.getElementById('send-egg-btn');
     if (sendEggBtn) {
         sendEggBtn.addEventListener('click', () => {
-            // Open inline mode in Telegram
-            tg.openTelegramLink('https://t.me/tohatchbot?start=egg');
+            // Open inline mode to send @tohatchbot in chat
+            tg.switchInlineQuery('@tohatchbot', ['users', 'bots', 'groups', 'channels']);
         });
     }
 }
@@ -168,11 +168,36 @@ async function checkSubscription() {
     }
 }
 
+// Navigation
+function setupNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page');
+    
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const targetPage = item.getAttribute('data-page');
+            
+            // Update active nav item
+            navItems.forEach(nav => nav.classList.remove('active'));
+            item.classList.add('active');
+            
+            // Show target page
+            pages.forEach(page => {
+                page.classList.remove('active');
+                if (page.id === `page-${targetPage}`) {
+                    page.classList.add('active');
+                }
+            });
+        });
+    });
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadStats();
     setupSendEggButton();
     setupSubscribeButton();
+    setupNavigation();
     
     // Handle back button
     tg.BackButton.onClick(() => {

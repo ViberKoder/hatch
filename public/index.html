@@ -12,63 +12,73 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="header-section">
-            <div class="gif-container">
-                <img src="https://s4.ezgif.com/tmp/ezgif-4ab44646530a1823.gif" alt="Egg Animation" class="main-gif">
+        <!-- Home Page -->
+        <div class="page active" id="page-home">
+            <div class="header-section">
+                <div class="image-container">
+                    <img src="https://em-content.zobj.net/source/telegram/386/hatching-chick_1f423.webp" alt="Hatching Chick" class="main-image">
+                </div>
+                <div class="egg-points">
+                    <span class="egg-label">Egg:</span>
+                    <span class="egg-value" id="egg-points">0</span>
+                </div>
             </div>
-            <div class="points-section">
-                <div class="points-label">Egg</div>
-                <div class="points-value" id="egg-points">0</div>
-            </div>
-        </div>
 
-        <div class="stats-container">
-            <div class="stat-card hatched-card">
-                <div class="stat-header">
-                    <div class="stat-icon">🐣</div>
-                    <div class="stat-info">
-                        <div class="stat-label">Hatched</div>
-                        <div class="stat-value" id="hatched-count">0</div>
+            <div class="stats-container">
+                <div class="stat-card hatched-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🐣</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Hatched</div>
+                            <div class="stat-value" id="hatched-count">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-description">Eggs you've hatched</div>
+                </div>
+
+                <div class="stat-card received-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🥚</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Your Eggs</div>
+                            <div class="stat-value" id="my-eggs-count">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-description">Your eggs hatched by others</div>
+                </div>
+            </div>
+
+            <div class="send-egg-section">
+                <div class="message-bubble" id="send-egg-btn">
+                    <div class="message-content">
+                        <div class="message-text">@tohatchbot</div>
+                        <div class="message-hint">Tap to send egg to chat</div>
+                    </div>
+                    <div class="message-arrow"></div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-card">
+                    <h3>How it works</h3>
+                    <p>Send eggs through @tohatchbot in any chat. Only recipients can hatch your eggs!</p>
+                    <div class="points-info">
+                        <p><strong>Earn Egg points:</strong></p>
+                        <ul>
+                            <li>+2 Egg when someone hatches your egg</li>
+                            <li>+1 Egg when you hatch someone's egg</li>
+                        </ul>
                     </div>
                 </div>
-                <div class="stat-description">Eggs you've hatched</div>
-            </div>
-
-            <div class="stat-card received-card">
-                <div class="stat-header">
-                    <div class="stat-icon">🥚</div>
-                    <div class="stat-info">
-                        <div class="stat-label">Your Eggs</div>
-                        <div class="stat-value" id="my-eggs-count">0</div>
-                    </div>
-                </div>
-                <div class="stat-description">Your eggs hatched by others</div>
             </div>
         </div>
 
-        <div class="actions-section">
-            <button class="action-button primary" id="send-egg-btn">
-                <span class="button-icon">🥚</span>
-                <span class="button-text">Send Egg</span>
-            </button>
-        </div>
-
-        <div class="info-section">
-            <div class="info-card">
-                <h3>How it works</h3>
-                <p>Send eggs through @tohatchbot in any chat. Only recipients can hatch your eggs!</p>
-                <div class="points-info">
-                    <p><strong>Earn Egg points:</strong></p>
-                    <ul>
-                        <li>+2 Egg when someone hatches your egg</li>
-                        <li>+1 Egg when you hatch someone's egg</li>
-                    </ul>
-                </div>
+        <!-- More Egg Page -->
+        <div class="page" id="page-more-egg">
+            <div class="page-header">
+                <h2 class="page-title">More Egg</h2>
             </div>
-        </div>
 
-        <div class="more-egg-section" id="more-egg-section">
-            <h2 class="section-title">More Egg</h2>
             <div class="tasks-container">
                 <div class="task-card" id="task-subscribe">
                     <div class="task-header">
@@ -84,8 +94,16 @@
             </div>
         </div>
 
-        <div class="footer">
-            <p>Powered by TON</p>
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button class="nav-item active" data-page="home">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </button>
+            <button class="nav-item" data-page="more-egg">
+                <div class="nav-icon">🥚</div>
+                <div class="nav-label">More Egg</div>
+            </button>
         </div>
     </div>
 
