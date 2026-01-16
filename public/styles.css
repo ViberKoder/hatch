@@ -96,7 +96,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('https://optim.tildacdn.com/tild3534-6332-4335-b263-313939343466/-/format/webp/Screenshot_2026-01-1.png.webp');
+    background-image: url('https://static.tildacdn.com/tild3534-6332-4335-b263-313939343466/Screenshot_2026-01-1.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -257,28 +257,41 @@ body::before {
 .task-card {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 16px;
+    padding: 20px;
     transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.task-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 .task-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
+    gap: 16px;
+    margin-bottom: 12px;
 }
 
 .task-icon {
-    font-size: 32px;
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--bg-secondary);
-    border-radius: 10px;
+    border-radius: 14px;
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+.task-icon-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
 }
 
 .task-info {
@@ -287,53 +300,94 @@ body::before {
 
 .task-title {
     font-family: 'matter', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
 }
 
 .task-reward {
     font-family: 'matter', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
     color: #f59e0b;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .task-description {
     font-family: 'matter', sans-serif;
     color: var(--text-secondary);
-    font-size: 13px;
-    margin-bottom: 12px;
-    line-height: 1.4;
+    font-size: 14px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+    font-weight: 400;
 }
 
 .task-button {
     width: 100%;
-    padding: 10px 20px;
+    padding: 14px 24px;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-family: 'matter', sans-serif;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     background: var(--accent-blue);
     color: white;
     transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .task-button:hover {
     opacity: 0.9;
+    box-shadow: var(--shadow-md);
 }
 
 .task-button:active {
     transform: scale(0.98);
 }
 
+.task-button.subscribe-button {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+    background-size: 200% 200%;
+    animation: gradientShift 3s ease infinite;
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.task-button.subscribe-button:hover {
+    animation-duration: 1.5s;
+    box-shadow: 0 6px 16px rgba(251, 191, 36, 0.4);
+    transform: translateY(-2px);
+}
+
+.task-button.subscribe-button:active {
+    transform: scale(0.98) translateY(0);
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
 .task-button.completed {
     background: var(--bg-secondary);
     color: var(--text-secondary);
     cursor: not-allowed;
+    animation: none;
+    box-shadow: none;
 }
 
 .task-button.completed::after {
