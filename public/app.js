@@ -69,16 +69,6 @@ async function loadStats() {
             animateValue(myEggsCountEl, 0, data.my_eggs_hatched || 0, 1000);
             animateValue(eggPointsEl, 0, data.egg_points || 0, 1000);
             
-            // Update egg counter page and nav
-            const eggCounterValue = document.getElementById('egg-counter-value');
-            const navEggCounter = document.getElementById('nav-egg-counter');
-            if (eggCounterValue) {
-                animateValue(eggCounterValue, 0, data.egg_points || 0, 1000);
-            }
-            if (navEggCounter) {
-                navEggCounter.textContent = (data.egg_points || 0).toLocaleString();
-            }
-            
             // Update task status
             updateTaskStatus(data.tasks || {});
         } else {
