@@ -113,13 +113,13 @@ function animateValue(element, start, end, duration) {
     window.requestAnimationFrame(step);
 }
 
-// Handle Send Egg button
+// Handle Send Egg image button
 function setupSendEggButton() {
-    const sendEggBtn = document.getElementById('send-egg-btn');
-    if (sendEggBtn) {
-        sendEggBtn.addEventListener('click', () => {
-            // Open inline mode to send @tohatchbot in chat
-            tg.switchInlineQuery('@tohatchbot', ['users', 'bots', 'groups', 'channels']);
+    const sendEggImageBtn = document.getElementById('send-egg-image-btn');
+    if (sendEggImageBtn) {
+        sendEggImageBtn.addEventListener('click', () => {
+            // Open inline mode to forward "@tohatchbot egg" to chats
+            tg.switchInlineQuery('@tohatchbot egg', ['users', 'bots', 'groups', 'channels']);
         });
     }
 }
@@ -192,12 +192,52 @@ function setupNavigation() {
     });
 }
 
+// TON Connect
+let tonConnectUI = null;
+
+function setupTONConnect() {
+    const tonConnectBtn = document.getElementById('ton-connect-btn');
+    if (tonConnectBtn && window.TonConnectUI) {
+        try {
+            tonConnectUI = new window.TonConnectUI({
+                manifestUrl: window.location.origin + '/tonconnect-manifest.json',
+                buttonRootId: 'ton-connect-btn'
+            });
+            
+            // Handle connection
+            tonConnectUI.onStatusChange((wallet) => {
+                if (wallet) {
+                    console.log('TON Wallet connected:', wallet);
+                    tonConnectBtn.textContent = 'Connected ✓';
+                    tonConnectBtn.disabled = true;
+                } else {
+                    console.log('TON Wallet disconnected');
+                    tonConnectBtn.textContent = 'Connect TON Wallet';
+                    tonConnectBtn.disabled = false;
+                }
+            });
+        } catch (error) {
+            console.error('TON Connect initialization error:', error);
+            // Fallback: simple button click
+            tonConnectBtn.addEventListener('click', () => {
+                tg.showAlert('TON Connect will be available soon!');
+            });
+        }
+    } else if (tonConnectBtn) {
+        // Fallback if TON Connect UI is not loaded
+        tonConnectBtn.addEventListener('click', () => {
+            tg.showAlert('TON Connect will be available soon!');
+        });
+    }
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadStats();
     setupSendEggButton();
     setupSubscribeButton();
     setupNavigation();
+    setupTONConnect();
     
     // Handle back button
     tg.BackButton.onClick(() => {
