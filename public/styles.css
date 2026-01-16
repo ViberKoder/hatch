@@ -96,7 +96,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('https://lime-gigantic-quelea-995.mypinata.cloud/ipfs/bafybeiekv2cuwv66lwcwptftrmubt6wqm55rgjcrrqsrevahhkiamjhxoi');
+    background-image: url('https://lime-gigantic-quelea-995.mypinata.cloud/ipfs/bafybeidnvoun2jeth5gbzw2pp5ghgiex6bmkkvjdvzzmlgyrmjw474mppa');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -187,7 +187,7 @@ body::before {
 }
 
 .send-egg-image-button img {
-    max-width: 200px;
+    max-width: 266px;
     height: auto;
     display: block;
     border-radius: 8px;
@@ -197,28 +197,31 @@ body::before {
 .stats-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
     margin-top: 40px;
     opacity: 0.8;
 }
 
 .stat-item {
     font-family: 'matter', sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text-secondary);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
+    padding: 6px 0;
+    gap: 8px;
 }
 
 .stat-text {
     font-weight: 400;
+    flex-shrink: 0;
 }
 
 .stat-value {
     font-weight: 600;
     color: var(--text-primary);
+    white-space: nowrap;
 }
 
 /* Page Header */
@@ -421,6 +424,32 @@ body::before {
     transform: scale(0.98);
 }
 
+/* Egg Counter Page */
+.egg-counter-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 80px);
+    padding: 40px 20px;
+}
+
+.egg-counter-value {
+    font-family: 'matter', sans-serif;
+    font-size: 72px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 16px;
+}
+
+.egg-counter-label {
+    font-family: 'matter', sans-serif;
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
 /* Bottom Navigation */
 .bottom-nav {
     position: fixed;
@@ -456,6 +485,11 @@ body::before {
     color: var(--accent-blue);
 }
 
+.nav-item.center-nav {
+    flex: 0 0 auto;
+    min-width: 60px;
+}
+
 .nav-icon {
     font-size: 24px;
     margin-bottom: 2px;
@@ -465,6 +499,18 @@ body::before {
     width: 32px;
     height: 32px;
     object-fit: contain;
+}
+
+.nav-egg-counter {
+    font-family: 'matter', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.nav-item.center-nav.active .nav-egg-counter {
+    color: var(--accent-blue);
 }
 
 .nav-label {
@@ -500,7 +546,15 @@ body::before {
     }
     
     .send-egg-image-button img {
-        max-width: 250px;
+        max-width: 333px;
+    }
+    
+    .egg-counter-value {
+        font-size: 96px;
+    }
+    
+    .egg-counter-label {
+        font-size: 32px;
     }
 }
 
