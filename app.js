@@ -102,7 +102,7 @@ function setupSendEggButton() {
     if (sendEggBtn) {
         sendEggBtn.addEventListener('click', () => {
             // Open inline mode in Telegram
-            tg.openLink('https://t.me/tohatchbot?start=egg', { try_instant_view: false });
+            tg.openTelegramLink('https://t.me/tohatchbot?start=egg');
         });
     }
 }
