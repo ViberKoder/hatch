@@ -25,11 +25,7 @@ function getUserID() {
 }
 
 // API endpoint
-// TODO: Замените на ваш Railway API URL!
-// В Vercel Settings → Environment Variables установите:
-// API_URL = https://your-railway-app.railway.app/api/stats
-// Или обновите эту строку напрямую:
-const API_URL = 'https://your-railway-app.railway.app/api/stats';
+const API_URL = 'https://web-production-11ef2.up.railway.app/api/stats';
 
 // Log for debugging
 console.log('API URL:', API_URL);
