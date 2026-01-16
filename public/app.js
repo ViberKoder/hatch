@@ -112,10 +112,6 @@ function updateTaskStatus(tasks, data) {
         hatch100Button.classList.add('completed');
         hatch100Button.disabled = true;
         hatch100Task.style.opacity = '0.7';
-    } else if (hatchedCount >= 100) {
-        hatch100Button.textContent = 'Claim Reward';
-        hatch100Button.disabled = false;
-        hatch100Button.classList.remove('completed');
     } else {
         hatch100Button.textContent = 'In Progress';
         hatch100Button.disabled = true;
@@ -136,10 +132,6 @@ function updateTaskStatus(tasks, data) {
         send100Button.classList.add('completed');
         send100Button.disabled = true;
         send100Task.style.opacity = '0.7';
-    } else if (sentCount >= 100) {
-        send100Button.textContent = 'Claim Reward';
-        send100Button.disabled = false;
-        send100Button.classList.remove('completed');
     } else {
         send100Button.textContent = 'In Progress';
         send100Button.disabled = true;
