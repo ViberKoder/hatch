@@ -24,9 +24,26 @@ function getUserID() {
     return null;
 }
 
-// API endpoint - get from environment or use default
-// For Vercel, this should be set as environment variable
-const API_URL = process.env.API_URL || window.API_URL || 'https://your-api-server.com/api/stats';
+// API endpoint
+// In Vercel Settings → Environment Variables, set:
+// API_URL = https://your-railway-app.railway.app/api/stats
+// The build script will inject this into the page
+const API_URL = (() => {
+    // Check if API_URL was injected by build script
+    if (window.API_URL && window.API_URL !== '{{API_URL}}') {
+        return window.API_URL;
+    }
+    // Fallback - try to get from script tag
+    const scriptTag = document.querySelector('script[data-api-url]');
+    if (scriptTag) {
+        return scriptTag.getAttribute('data-api-url');
+    }
+    // Default fallback
+    return 'https://your-api-server.com/api/stats';
+})();
+
+// Log for debugging
+console.log('API URL:', API_URL);
 
 // Load statistics
 async function loadStats() {

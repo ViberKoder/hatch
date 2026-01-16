@@ -9,7 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-</head>
+    <script data-api-url="{{API_URL}}">
+        // API URL will be injected by build script
+        window.API_URL = document.currentScript?.getAttribute('data-api-url') || 'https://your-api-server.com/api/stats';
+    </script>
 <body>
     <div class="app-container">
         <div class="header-section">

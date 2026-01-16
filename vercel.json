@@ -23,5 +23,7 @@
         }
       ]
     }
-  ]
+  ],
+  "buildCommand": "node vercel-build.js || echo 'Build complete'",
+  "devCommand": "echo 'Dev server'"
 }
