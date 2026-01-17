@@ -283,39 +283,26 @@ async function checkSubscription() {
     }
 }
 
-// Show specific page
-function showPage(pageName) {
-    const navItems = document.querySelectorAll('.nav-item');
-    const pages = document.querySelectorAll('.page');
-    
-    // Update active nav item
-    navItems.forEach(nav => {
-        const navPage = nav.getAttribute('data-page');
-        if (navPage === pageName) {
-            nav.classList.add('active');
-        } else {
-            nav.classList.remove('active');
-        }
-    });
-    
-    // Show target page
-    pages.forEach(page => {
-        if (page.id === `page-${pageName}`) {
-            page.classList.add('active');
-        } else {
-            page.classList.remove('active');
-        }
-    });
-}
-
 // Navigation
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page');
     
     navItems.forEach(item => {
         item.addEventListener('click', () => {
             const targetPage = item.getAttribute('data-page');
-            showPage(targetPage);
+            
+            // Update active nav item
+            navItems.forEach(nav => nav.classList.remove('active'));
+            item.classList.add('active');
+            
+            // Show target page
+            pages.forEach(page => {
+                page.classList.remove('active');
+                if (page.id === `page-${targetPage}`) {
+                    page.classList.add('active');
+                }
+            });
         });
     });
     
@@ -331,7 +318,23 @@ function setupNavigation() {
             'home': 'home'
         };
         const targetPage = pageMap[pageParam] || 'home';
-        showPage(targetPage);
+        
+        // Update nav
+        navItems.forEach(nav => {
+            if (nav.getAttribute('data-page') === targetPage) {
+                nav.classList.add('active');
+            } else {
+                nav.classList.remove('active');
+            }
+        });
+        
+        // Show page
+        pages.forEach(page => {
+            page.classList.remove('active');
+            if (page.id === `page-${targetPage}`) {
+                page.classList.add('active');
+            }
+        });
     }
 }
 
