@@ -18,6 +18,10 @@
                 <div class="image-container">
                     <img src="https://em-content.zobj.net/source/telegram/386/hatching-chick_1f423.webp" alt="Hatching Chick" class="main-image">
                 </div>
+                <div class="hatch-counter">
+                    <span class="hatch-value" id="hatch-points">0</span>
+                    <span class="hatch-label">Hatch</span>
+                </div>
                 <div class="egg-points">
                     <span class="egg-label">Egg:</span>
                     <span class="egg-value" id="egg-points">0</span>
@@ -60,10 +64,10 @@
                             </div>
                             <div class="task-text-wrapper">
                                 <div class="task-title">Cocoin follow</div>
-                                <div class="task-reward">333 Egg</div>
+                                <div class="task-reward">100 Egg</div>
                             </div>
                         </div>
-                        <button class="task-button subscribe-button" id="subscribe-button">Take Egg</button>
+                        <button class="task-button subscribe-button" id="subscribe-button">Complete</button>
                     </div>
                 </div>
 
@@ -75,16 +79,15 @@
                                 <span style="font-size: 32px;">🐣</span>
                             </div>
                             <div class="task-text-wrapper">
-                                <div class="task-title">Hatch 100 egg</div>
-                                <div class="task-reward">500 Egg</div>
-                                <div class="task-progress" id="hatch-progress">0 / 100</div>
+                                <div class="task-title">333 Hatch</div>
+                                <div class="task-reward">100 Egg</div>
                             </div>
                         </div>
-                        <button class="task-button" id="hatch-100-button" disabled>In Progress</button>
+                        <button class="task-button" id="hatch-100-button">Complete</button>
                     </div>
                 </div>
 
-                <div class="task-card" id="task-send-100">
+                <div class="task-card" id="task-send-100" style="display: none;">
                     <div class="task-shape"></div>
                     <div class="task-content-wrapper">
                         <div class="task-content-top">
@@ -102,7 +105,7 @@
                 </div>
 
                 <!-- Buy Eggs Section -->
-                <div class="task-card" id="buy-eggs-card" style="margin-top: 20px;">
+                <div class="task-card" id="buy-eggs-card">
                     <div class="task-shape"></div>
                     <div class="task-content-wrapper">
                         <div class="task-content-top">
@@ -110,8 +113,8 @@
                                 <span style="font-size: 32px;">💎</span>
                             </div>
                             <div class="task-text-wrapper">
-                                <div class="task-title">Buy Eggs</div>
-                                <div class="task-reward" style="color: #0088cc;">10 eggs = 0.1 TON</div>
+                                <div class="task-title">Want send more eggs?</div>
+                                <div class="task-reward">100 Egg</div>
                                 <div class="task-progress" style="margin-top: 8px;">
                                     <div style="margin-bottom: 8px;">
                                         <label style="display: block; font-size: 14px; color: var(--text-secondary); margin-bottom: 4px;">Number of eggs (10-1000):</label>
@@ -123,7 +126,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="task-button" id="buy-eggs-button" style="background: linear-gradient(135deg, #0088cc 0%, #00d4aa 100%);">Buy Eggs</button>
+                        <button class="task-button" id="buy-eggs-button" style="background: linear-gradient(135deg, #0088cc 0%, #00d4aa 100%);">Buy</button>
                     </div>
                 </div>
             </div>
@@ -143,17 +146,28 @@
                     <h3>How it works</h3>
                     <p>Send eggs through @tohatchbot in any chat. Only recipients can hatch your eggs!</p>
                     <div class="points-info">
-                        <p><strong>Earn Egg points:</strong></p>
+                        <p><strong>Earn Hatch points:</strong></p>
                         <ul>
-                            <li>+2 Egg when someone hatches your egg</li>
-                            <li>+1 Egg when you hatch someone's egg</li>
+                            <li>+2 Hatch when someone hatches your egg</li>
+                            <li>+1 Hatch when you hatch someone's egg</li>
                         </ul>
+                    </div>
+                </div>
+
+                <div class="referral-stats">
+                    <div class="referral-stat-item">
+                        <span class="referral-label">Referrals:</span>
+                        <span class="referral-value" id="referrals-count">0</span>
+                    </div>
+                    <div class="referral-stat-item">
+                        <span class="referral-label">Earned with referrals:</span>
+                        <span class="referral-value" id="referral-earnings">0</span>
                     </div>
                 </div>
 
                 <div class="ton-connect-section">
                     <button class="ton-connect-button" id="ton-connect-manual-btn" style="width: 100%; padding: 14px 20px; border: none; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; background: #0088cc; color: white; transition: all 0.2s ease;">
-                        Connect TON Wallet
+                        TON Connect
                     </button>
                     <div id="ton-connect-btn" style="display: none;"></div>
                     <div id="wallet-status" style="margin-top: 12px; padding: 12px; background: #f5f5f5; border-radius: 8px; display: none;">

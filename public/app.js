@@ -40,21 +40,30 @@ async function loadStats() {
     const hatchedCountEl = document.getElementById('hatched-count');
     const myEggsCountEl = document.getElementById('my-eggs-count');
     const eggPointsEl = document.getElementById('egg-points');
+    const hatchPointsEl = document.getElementById('hatch-points');
+    const referralsCountEl = document.getElementById('referrals-count');
+    const referralEarningsEl = document.getElementById('referral-earnings');
     
     const userId = getUserID();
     
     if (!userId) {
         console.warn('No user ID found');
-        hatchedCountEl.textContent = '0';
-        myEggsCountEl.textContent = '0';
-        eggPointsEl.textContent = '0';
+        if (hatchedCountEl) hatchedCountEl.textContent = '0';
+        if (myEggsCountEl) myEggsCountEl.textContent = '0';
+        if (eggPointsEl) eggPointsEl.textContent = '0';
+        if (hatchPointsEl) hatchPointsEl.textContent = '0';
+        if (referralsCountEl) referralsCountEl.textContent = '0';
+        if (referralEarningsEl) referralEarningsEl.textContent = '0';
         return;
     }
     
     // Show loading
-    hatchedCountEl.innerHTML = '<span class="loading"></span>';
-    myEggsCountEl.innerHTML = '<span class="loading"></span>';
-    eggPointsEl.innerHTML = '<span class="loading"></span>';
+    if (hatchedCountEl) hatchedCountEl.innerHTML = '<span class="loading"></span>';
+    if (myEggsCountEl) myEggsCountEl.innerHTML = '<span class="loading"></span>';
+    if (eggPointsEl) eggPointsEl.innerHTML = '<span class="loading"></span>';
+    if (hatchPointsEl) hatchPointsEl.innerHTML = '<span class="loading"></span>';
+    if (referralsCountEl) referralsCountEl.innerHTML = '<span class="loading"></span>';
+    if (referralEarningsEl) referralEarningsEl.innerHTML = '<span class="loading"></span>';
     
     try {
         console.log(`Fetching stats from: ${API_URL}?user_id=${userId}`);
@@ -70,9 +79,23 @@ async function loadStats() {
         if (response.ok) {
             const data = await response.json();
             console.log('Stats data:', data);
-            animateValue(hatchedCountEl, 0, data.hatched_by_me || 0, 1000);
-            animateValue(myEggsCountEl, 0, data.my_eggs_hatched || 0, 1000);
-            animateValue(eggPointsEl, 0, data.egg_points || 0, 1000);
+            
+            // Hatch points = вылупленные яйца (hatched_by_me)
+            const hatchPoints = data.hatched_by_me || 0;
+            if (hatchPointsEl) animateValue(hatchPointsEl, 0, hatchPoints, 1000);
+            
+            // Egg points = яйца для отправки
+            if (eggPointsEl) animateValue(eggPointsEl, 0, data.egg_points || 0, 1000);
+            
+            // Статистика
+            if (hatchedCountEl) animateValue(hatchedCountEl, 0, data.hatched_by_me || 0, 1000);
+            if (myEggsCountEl) animateValue(myEggsCountEl, 0, data.my_eggs_hatched || 0, 1000);
+            
+            // Рефералы
+            const referralsCount = data.referrals_count || 0;
+            const referralEarnings = data.referral_earnings || 0;
+            if (referralsCountEl) animateValue(referralsCountEl, 0, referralsCount, 1000);
+            if (referralEarningsEl) animateValue(referralEarningsEl, 0, referralEarnings, 1000);
             
             // Update task status and progress
             updateTaskStatus(data.tasks || {}, data);
@@ -83,9 +106,12 @@ async function loadStats() {
         }
     } catch (error) {
         console.error('Error loading stats:', error);
-        hatchedCountEl.textContent = '0';
-        myEggsCountEl.textContent = '0';
-        eggPointsEl.textContent = '0';
+        if (hatchedCountEl) hatchedCountEl.textContent = '0';
+        if (myEggsCountEl) myEggsCountEl.textContent = '0';
+        if (eggPointsEl) eggPointsEl.textContent = '0';
+        if (hatchPointsEl) hatchPointsEl.textContent = '0';
+        if (referralsCountEl) referralsCountEl.textContent = '0';
+        if (referralEarningsEl) referralEarningsEl.textContent = '0';
     }
 }
 
@@ -97,80 +123,84 @@ function updateTaskStatus(tasks, data) {
     
     if (subscribeButton && subscribeTask) {
         if (tasks.subscribed_to_cocoin) {
-            subscribeButton.textContent = 'Subscribed ✓';
+            subscribeButton.textContent = 'Completed';
             subscribeButton.classList.add('completed');
             subscribeButton.disabled = true;
             subscribeTask.style.opacity = '0.7';
         }
     }
     
-    // Hatch 100 egg task
+    // Hatch 333 task
     const hatch100Button = document.getElementById('hatch-100-button');
     const hatch100Task = document.getElementById('task-hatch-100');
-    const hatchProgress = document.getElementById('hatch-progress');
     const hatchedCount = data.hatched_by_me || 0;
     
-    if (hatchProgress) {
-        hatchProgress.textContent = `${Math.min(hatchedCount, 100)} / 100`;
-    }
-    
     if (hatch100Button && hatch100Task) {
-        if (tasks.hatch_100_eggs) {
-            hatch100Button.textContent = 'Completed ✓';
+        if (tasks.hatch_333_eggs) {
+            hatch100Button.textContent = 'Completed';
             hatch100Button.classList.add('completed');
             hatch100Button.disabled = true;
             hatch100Task.style.opacity = '0.7';
         } else {
-            hatch100Button.textContent = 'In Progress';
-            hatch100Button.disabled = true;
-        }
-    }
-    
-    // Send 100 egg task
-    const send100Button = document.getElementById('send-100-button');
-    const send100Task = document.getElementById('task-send-100');
-    const sendProgress = document.getElementById('send-progress');
-    const sentCount = data.eggs_sent || 0;
-    
-    if (sendProgress) {
-        sendProgress.textContent = `${Math.min(sentCount, 100)} / 100`;
-    }
-    
-    if (send100Button && send100Task) {
-        if (tasks.send_100_eggs) {
-            send100Button.textContent = 'Completed ✓';
-            send100Button.classList.add('completed');
-            send100Button.disabled = true;
-            send100Task.style.opacity = '0.7';
-        } else {
-            send100Button.textContent = 'In Progress';
-            send100Button.disabled = true;
+            hatch100Button.textContent = 'Complete';
+            hatch100Button.disabled = false;
+            // Remove old event listeners by cloning
+            const newButton = hatch100Button.cloneNode(true);
+            hatch100Button.parentNode.replaceChild(newButton, hatch100Button);
+            
+            // Add click handler
+            const updatedButton = document.getElementById('hatch-100-button');
+            updatedButton.addEventListener('click', async () => {
+                if (hatchedCount >= 333) {
+                    const userId = getUserID();
+                    try {
+                        // Task is auto-completed when user reaches 333 hatches
+                        // Just reload stats
+                        loadStats();
+                        tg.showAlert('Task completed! You earned 100 Egg points! 🎉');
+                    } catch (error) {
+                        console.error('Error completing task:', error);
+                    }
+                } else {
+                    tg.showAlert(`You need to hatch ${333 - hatchedCount} more eggs to complete this task.`);
+                }
+            });
         }
     }
 }
 
-// Animate number counting
+// Animate value counter
 function animateValue(element, start, end, duration) {
-    let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-        const current = Math.floor(easeOutQuart * (end - start) + start);
-        element.textContent = current.toLocaleString();
+    if (!element) return;
+    
+    const startTime = performance.now();
+    const isInteger = Number.isInteger(start) && Number.isInteger(end);
+    
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function (ease-out)
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const current = start + (end - start) * easeOut;
+        
+        element.textContent = isInteger ? Math.floor(current) : current.toFixed(1);
+        
         if (progress < 1) {
-            window.requestAnimationFrame(step);
+            requestAnimationFrame(update);
+        } else {
+            element.textContent = isInteger ? end : end.toFixed(1);
         }
-    };
-    window.requestAnimationFrame(step);
+    }
+    
+    requestAnimationFrame(update);
 }
 
-// Handle Send Egg image button
+// Setup send egg button
 function setupSendEggButton() {
-    const sendEggImageBtn = document.getElementById('send-egg-image-btn');
-    if (sendEggImageBtn) {
-        sendEggImageBtn.addEventListener('click', () => {
-            // Open inline mode to forward "@tohatchbot egg" to chats
+    const sendEggBtn = document.getElementById('send-egg-image-btn');
+    if (sendEggBtn) {
+        sendEggBtn.addEventListener('click', () => {
             tg.switchInlineQuery('@tohatchbot egg', ['users', 'bots', 'groups', 'channels']);
         });
     }
@@ -210,7 +240,7 @@ async function checkSubscription() {
             if (data.subscribed) {
                 // Reload stats to update points
                 loadStats();
-                tg.showAlert('You earned 333 Egg points! 🎉');
+                tg.showAlert('You earned 100 Egg points! 🎉');
             } else {
                 tg.showAlert('Please subscribe to @cocoin channel first');
             }
@@ -220,28 +250,56 @@ async function checkSubscription() {
     }
 }
 
+// Show specific page
+function showPage(pageName) {
+    const navItems = document.querySelectorAll('.nav-item');
+    const pages = document.querySelectorAll('.page');
+    
+    // Update active nav item
+    navItems.forEach(nav => {
+        const navPage = nav.getAttribute('data-page');
+        if (navPage === pageName) {
+            nav.classList.add('active');
+        } else {
+            nav.classList.remove('active');
+        }
+    });
+    
+    // Show target page
+    pages.forEach(page => {
+        if (page.id === `page-${pageName}`) {
+            page.classList.add('active');
+        } else {
+            page.classList.remove('active');
+        }
+    });
+}
+
 // Navigation
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
-    const pages = document.querySelectorAll('.page');
     
     navItems.forEach(item => {
         item.addEventListener('click', () => {
             const targetPage = item.getAttribute('data-page');
-            
-            // Update active nav item
-            navItems.forEach(nav => nav.classList.remove('active'));
-            item.classList.add('active');
-            
-            // Show target page
-            pages.forEach(page => {
-                page.classList.remove('active');
-                if (page.id === `page-${targetPage}`) {
-                    page.classList.add('active');
-                }
-            });
+            showPage(targetPage);
         });
     });
+    
+    // Check for deep link in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const pageParam = urlParams.get('page');
+    if (pageParam) {
+        // Map page names
+        const pageMap = {
+            'more-egg': 'more-egg',
+            'more': 'more-egg',
+            'profile': 'profile',
+            'home': 'home'
+        };
+        const targetPage = pageMap[pageParam] || 'home';
+        showPage(targetPage);
+    }
 }
 
 // TON Connect Setup
@@ -293,7 +351,7 @@ function setupTONConnect() {
                     
                     // Update manual button
                     if (tonConnectManualBtn) {
-                        tonConnectManualBtn.textContent = 'Connect TON Wallet';
+                        tonConnectManualBtn.textContent = 'TON Connect';
                         tonConnectManualBtn.style.background = '#0088cc';
                         tonConnectManualBtn.disabled = false;
                     }
@@ -367,16 +425,8 @@ function setupBuyEggs() {
     eggsInput.addEventListener('input', (e) => {
         const eggs = validateEggs(e.target.value);
         e.target.value = eggs;
-        const price = (eggs / 10) * 0.1; // 10 eggs = 0.1 TON
-        selectedPrice.textContent = price.toFixed(1);
-    });
-    
-    // Validate on blur
-    eggsInput.addEventListener('blur', (e) => {
-        const eggs = validateEggs(e.target.value);
-        e.target.value = eggs;
-        const price = (eggs / 10) * 0.1;
-        selectedPrice.textContent = price.toFixed(1);
+        const amount = (eggs / 10) * 0.1; // 10 eggs = 0.1 TON
+        selectedPrice.textContent = amount.toFixed(1);
     });
     
     // Handle buy button
@@ -414,6 +464,8 @@ function setupBuyEggs() {
             
             // Verify payment
             const userId = getUserID();
+            // Use boc (bag of cells) as transaction hash, or the result itself
+            const txHash = result.boc || (typeof result === 'string' ? result : JSON.stringify(result));
             const verifyResponse = await fetch(`${BOT_API_URL}/api/ton/verify_payment`, {
                 method: 'POST',
                 headers: {
@@ -421,7 +473,7 @@ function setupBuyEggs() {
                 },
                 body: JSON.stringify({
                     user_id: userId,
-                    tx_hash: result.boc,
+                    tx_hash: txHash,
                     amount: amount
                 })
             });
@@ -439,7 +491,7 @@ function setupBuyEggs() {
             tg.showAlert(`❌ Payment failed: ${error.message}`);
         } finally {
             buyButton.disabled = false;
-            buyButton.textContent = 'Buy Eggs';
+            buyButton.textContent = 'Buy';
         }
     });
 }
