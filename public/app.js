@@ -372,10 +372,7 @@ function setupNavigation() {
 
 // TON Connect Setup
 function setupTONConnect() {
-    const tonConnectManualBtn = document.getElementById('ton-connect-manual-btn');
     const tonConnectBtn = document.getElementById('ton-connect-btn');
-    const walletStatus = document.getElementById('wallet-status');
-    const walletAddressEl = document.getElementById('wallet-address');
     
     // Wait for TON Connect UI to load
     function initTONConnect() {
@@ -386,7 +383,7 @@ function setupTONConnect() {
             return;
         }
         
-        // Initialize TON Connect UI (hidden button for automatic connection)
+        // Initialize TON Connect UI with standard button
         try {
             tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({
                 manifestUrl: window.location.origin + '/tonconnect-manifest.json',
@@ -400,34 +397,9 @@ function setupTONConnect() {
                 if (wallet) {
                     walletAddress = wallet.account.address;
                     console.log('TON Wallet connected:', walletAddress);
-                    
-                    // Update manual button
-                    if (tonConnectManualBtn) {
-                        tonConnectManualBtn.textContent = 'Connected ✓';
-                        tonConnectManualBtn.style.background = '#00d4aa';
-                        tonConnectManualBtn.disabled = true;
-                    }
-                    
-                    // Show wallet status
-                    if (walletStatus && walletAddressEl) {
-                        walletStatus.style.display = 'block';
-                        walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
-                    }
                 } else {
                     walletAddress = null;
                     console.log('TON Wallet disconnected');
-                    
-                    // Update manual button
-                    if (tonConnectManualBtn) {
-                        tonConnectManualBtn.textContent = 'TON Connect';
-                        tonConnectManualBtn.style.background = '#0088cc';
-                        tonConnectManualBtn.disabled = false;
-                    }
-                    
-                    // Hide wallet status
-                    if (walletStatus) {
-                        walletStatus.style.display = 'none';
-                    }
                 }
             });
             
@@ -435,36 +407,12 @@ function setupTONConnect() {
             tonConnectUI.connectionRestored.then(() => {
                 if (tonConnectUI.wallet?.account) {
                     walletAddress = tonConnectUI.wallet.account.address;
-                    if (tonConnectManualBtn) {
-                        tonConnectManualBtn.textContent = 'Connected ✓';
-                        tonConnectManualBtn.style.background = '#00d4aa';
-                        tonConnectManualBtn.disabled = true;
-                    }
-                    if (walletStatus && walletAddressEl) {
-                        walletStatus.style.display = 'block';
-                        walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
-                    }
                 }
             }).catch(err => {
                 console.log('No existing connection:', err);
             });
-            
-            // Manual button click - open TON Connect modal
-            if (tonConnectManualBtn) {
-                tonConnectManualBtn.addEventListener('click', () => {
-                    if (!walletAddress && tonConnectUI) {
-                        // Open TON Connect modal
-                        tonConnectUI.openModal();
-                    }
-                });
-            }
         } catch (error) {
             console.error('TON Connect initialization error:', error);
-            if (tonConnectManualBtn) {
-                tonConnectManualBtn.addEventListener('click', () => {
-                    tg.showAlert('TON Connect error: ' + error.message);
-                });
-            }
         }
     }
     
