@@ -246,70 +246,135 @@ function setupNavigation() {
 
 // TON Connect Setup
 function setupTONConnect() {
+    const tonConnectManualBtn = document.getElementById('ton-connect-manual-btn');
     const tonConnectBtn = document.getElementById('ton-connect-btn');
     const walletStatus = document.getElementById('wallet-status');
     const walletAddressEl = document.getElementById('wallet-address');
     
-    if (tonConnectBtn && window.TonConnectUI) {
-        try {
-            tonConnectUI = new window.TonConnectUI({
-                manifestUrl: window.location.origin + '/tonconnect-manifest.json',
-                buttonRootId: 'ton-connect-btn'
+    if (!window.TonConnectUI) {
+        console.error('TON Connect UI not loaded');
+        if (tonConnectManualBtn) {
+            tonConnectManualBtn.addEventListener('click', () => {
+                tg.showAlert('TON Connect is loading... Please wait.');
             });
-            
-            // Handle connection
-            tonConnectUI.onStatusChange((wallet) => {
-                if (wallet) {
-                    walletAddress = wallet.account.address;
-                    console.log('TON Wallet connected:', walletAddress);
-                    
-                    // Show wallet status
-                    if (walletStatus && walletAddressEl) {
-                        walletStatus.style.display = 'block';
-                        walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
-                    }
-                } else {
-                    walletAddress = null;
-                    console.log('TON Wallet disconnected');
-                    
-                    // Hide wallet status
-                    if (walletStatus) {
-                        walletStatus.style.display = 'none';
+        }
+        return;
+    }
+    
+    // Initialize TON Connect UI (hidden button)
+    try {
+        tonConnectUI = new window.TonConnectUI({
+            manifestUrl: window.location.origin + '/tonconnect-manifest.json',
+            buttonRootId: 'ton-connect-btn'
+        });
+        
+        // Handle connection
+        tonConnectUI.onStatusChange((wallet) => {
+            if (wallet) {
+                walletAddress = wallet.account.address;
+                console.log('TON Wallet connected:', walletAddress);
+                
+                // Update manual button
+                if (tonConnectManualBtn) {
+                    tonConnectManualBtn.textContent = 'Connected ✓';
+                    tonConnectManualBtn.style.background = '#00d4aa';
+                    tonConnectManualBtn.disabled = true;
+                }
+                
+                // Show wallet status
+                if (walletStatus && walletAddressEl) {
+                    walletStatus.style.display = 'block';
+                    walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
+                }
+            } else {
+                walletAddress = null;
+                console.log('TON Wallet disconnected');
+                
+                // Update manual button
+                if (tonConnectManualBtn) {
+                    tonConnectManualBtn.textContent = 'Connect TON Wallet';
+                    tonConnectManualBtn.style.background = '#0088cc';
+                    tonConnectManualBtn.disabled = false;
+                }
+                
+                // Hide wallet status
+                if (walletStatus) {
+                    walletStatus.style.display = 'none';
+                }
+            }
+        });
+        
+        // Check if already connected
+        tonConnectUI.connectionRestored.then(() => {
+            if (tonConnectUI.wallet?.account) {
+                walletAddress = tonConnectUI.wallet.account.address;
+                if (tonConnectManualBtn) {
+                    tonConnectManualBtn.textContent = 'Connected ✓';
+                    tonConnectManualBtn.style.background = '#00d4aa';
+                    tonConnectManualBtn.disabled = true;
+                }
+                if (walletStatus && walletAddressEl) {
+                    walletStatus.style.display = 'block';
+                    walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
+                }
+            }
+        });
+        
+        // Manual button click - trigger TON Connect
+        if (tonConnectManualBtn) {
+            tonConnectManualBtn.addEventListener('click', () => {
+                if (!walletAddress && tonConnectUI) {
+                    // Trigger TON Connect by clicking the hidden button
+                    const hiddenBtn = document.querySelector('#ton-connect-btn button');
+                    if (hiddenBtn) {
+                        hiddenBtn.click();
+                    } else {
+                        // Fallback: try to open TON Connect
+                        tonConnectUI.openModal();
                     }
                 }
             });
-            
-            // Check if already connected
-            tonConnectUI.connectionRestored.then(() => {
-                if (tonConnectUI.wallet?.account) {
-                    walletAddress = tonConnectUI.wallet.account.address;
-                    if (walletStatus && walletAddressEl) {
-                        walletStatus.style.display = 'block';
-                        walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
-                    }
-                }
+        }
+    } catch (error) {
+        console.error('TON Connect initialization error:', error);
+        if (tonConnectManualBtn) {
+            tonConnectManualBtn.addEventListener('click', () => {
+                tg.showAlert('TON Connect initialization error. Please refresh the page.');
             });
-        } catch (error) {
-            console.error('TON Connect initialization error:', error);
         }
     }
 }
 
 // Setup Buy Eggs
 function setupBuyEggs() {
-    const slider = document.getElementById('eggs-slider');
-    const selectedEggs = document.getElementById('selected-eggs');
+    const eggsInput = document.getElementById('eggs-input');
     const selectedPrice = document.getElementById('selected-price');
     const buyButton = document.getElementById('buy-eggs-button');
     
-    if (!slider || !selectedEggs || !selectedPrice || !buyButton) return;
+    if (!eggsInput || !selectedPrice || !buyButton) return;
     
-    // Update display when slider changes
-    slider.addEventListener('input', (e) => {
-        const eggs = parseInt(e.target.value);
+    // Validate input
+    function validateEggs(value) {
+        const eggs = parseInt(value);
+        if (isNaN(eggs) || eggs < 10) return 10;
+        if (eggs > 1000) return 1000;
+        // Round to nearest 10
+        return Math.round(eggs / 10) * 10;
+    }
+    
+    // Update price when input changes
+    eggsInput.addEventListener('input', (e) => {
+        const eggs = validateEggs(e.target.value);
+        e.target.value = eggs;
         const price = (eggs / 10) * 0.1; // 10 eggs = 0.1 TON
-        
-        selectedEggs.textContent = `${eggs} eggs`;
+        selectedPrice.textContent = price.toFixed(1);
+    });
+    
+    // Validate on blur
+    eggsInput.addEventListener('blur', (e) => {
+        const eggs = validateEggs(e.target.value);
+        e.target.value = eggs;
+        const price = (eggs / 10) * 0.1;
         selectedPrice.textContent = price.toFixed(1);
     });
     
@@ -320,7 +385,12 @@ function setupBuyEggs() {
             return;
         }
         
-        const eggs = parseInt(slider.value);
+        const eggs = validateEggs(eggsInput.value);
+        if (eggs < 10 || eggs > 1000) {
+            tg.showAlert('Please enter a number between 10 and 1000');
+            return;
+        }
+        
         const amount = (eggs / 10) * 0.1; // 10 eggs = 0.1 TON
         const wallet = 'UQCHdlQ2TLpa6Kpu5Pu8HeJd1xe3EL1Kx2wFekeuOnSpFcP0';
         

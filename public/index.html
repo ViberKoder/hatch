@@ -113,11 +113,9 @@
                                 <div class="task-title">Buy Eggs</div>
                                 <div class="task-reward" style="color: #0088cc;">10 eggs = 0.1 TON</div>
                                 <div class="task-progress" style="margin-top: 8px;">
-                                    <input type="range" id="eggs-slider" min="10" max="1000" step="10" value="10" style="width: 100%; margin: 8px 0;">
-                                    <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--text-secondary);">
-                                        <span>10 eggs</span>
-                                        <span id="selected-eggs">10 eggs</span>
-                                        <span>1000 eggs</span>
+                                    <div style="margin-bottom: 8px;">
+                                        <label style="display: block; font-size: 14px; color: var(--text-secondary); margin-bottom: 4px;">Number of eggs (10-1000):</label>
+                                        <input type="number" id="eggs-input" min="10" max="1000" step="10" value="10" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; font-family: 'Inter', sans-serif;">
                                     </div>
                                     <div style="margin-top: 8px; font-size: 16px; font-weight: 600; color: #0088cc;">
                                         Price: <span id="selected-price">0.1</span> TON
@@ -154,7 +152,10 @@
                 </div>
 
                 <div class="ton-connect-section">
-                    <div id="ton-connect-btn"></div>
+                    <button class="ton-connect-button" id="ton-connect-manual-btn" style="width: 100%; padding: 14px 20px; border: none; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; background: #0088cc; color: white; transition: all 0.2s ease;">
+                        Connect TON Wallet
+                    </button>
+                    <div id="ton-connect-btn" style="display: none;"></div>
                     <div id="wallet-status" style="margin-top: 12px; padding: 12px; background: #f5f5f5; border-radius: 8px; display: none;">
                         <p style="font-size: 14px; color: #666; margin: 0;">Wallet: <span id="wallet-address" style="font-family: monospace; font-size: 12px;"></span></p>
                     </div>
