@@ -35,14 +35,46 @@ console.log('API URL:', API_URL);
 let tonConnectUI = null;
 let walletAddress = null;
 
+// Load user info from Telegram
+function loadUserInfo() {
+    const user = tg.initDataUnsafe?.user;
+    const userNameEl = document.getElementById('user-name');
+    const userAvatarEl = document.getElementById('user-avatar-img');
+    const userAvatarInitialEl = document.getElementById('user-avatar-initial');
+    const userAvatarFallback = document.querySelector('.user-avatar-fallback');
+    
+    if (user) {
+        // Set user name
+        if (userNameEl) {
+            const displayName = user.first_name || user.username || 'User';
+            userNameEl.textContent = displayName;
+        }
+        
+        // Set user avatar
+        if (user.photo_url && userAvatarEl) {
+            userAvatarEl.src = user.photo_url;
+            userAvatarEl.style.display = 'block';
+            if (userAvatarFallback) userAvatarFallback.style.display = 'none';
+        } else {
+            // Use initial
+            if (userAvatarEl) userAvatarEl.style.display = 'none';
+            if (userAvatarFallback) userAvatarFallback.style.display = 'flex';
+            if (userAvatarInitialEl) {
+                const initial = (user.first_name || user.username || 'U')[0].toUpperCase();
+                userAvatarInitialEl.textContent = initial;
+            }
+        }
+    }
+}
+
 // Load statistics and points
 async function loadStats() {
     const hatchedCountEl = document.getElementById('hatched-count');
     const myEggsCountEl = document.getElementById('my-eggs-count');
-    const eggPointsEl = document.getElementById('egg-points');
     const hatchPointsEl = document.getElementById('hatch-points');
     const referralsCountEl = document.getElementById('referrals-count');
     const referralEarningsEl = document.getElementById('referral-earnings');
+    const availableEggsEl = document.getElementById('available-eggs');
     
     const userId = getUserID();
     
@@ -50,20 +82,20 @@ async function loadStats() {
         console.warn('No user ID found');
         if (hatchedCountEl) hatchedCountEl.textContent = '0';
         if (myEggsCountEl) myEggsCountEl.textContent = '0';
-        if (eggPointsEl) eggPointsEl.textContent = '0';
         if (hatchPointsEl) hatchPointsEl.textContent = '0';
         if (referralsCountEl) referralsCountEl.textContent = '0';
         if (referralEarningsEl) referralEarningsEl.textContent = '0';
+        if (availableEggsEl) availableEggsEl.textContent = '10';
         return;
     }
     
     // Show loading
     if (hatchedCountEl) hatchedCountEl.innerHTML = '<span class="loading"></span>';
     if (myEggsCountEl) myEggsCountEl.innerHTML = '<span class="loading"></span>';
-    if (eggPointsEl) eggPointsEl.innerHTML = '<span class="loading"></span>';
     if (hatchPointsEl) hatchPointsEl.innerHTML = '<span class="loading"></span>';
     if (referralsCountEl) referralsCountEl.innerHTML = '<span class="loading"></span>';
     if (referralEarningsEl) referralEarningsEl.innerHTML = '<span class="loading"></span>';
+    if (availableEggsEl) availableEggsEl.innerHTML = '<span class="loading"></span>';
     
     try {
         console.log(`Fetching stats from: ${API_URL}?user_id=${userId}`);
@@ -84,12 +116,13 @@ async function loadStats() {
             const hatchPoints = data.hatched_by_me || 0;
             if (hatchPointsEl) animateValue(hatchPointsEl, 0, hatchPoints, 1000);
             
-            // Egg points = яйца для отправки
-            if (eggPointsEl) animateValue(eggPointsEl, 0, data.egg_points || 0, 1000);
-            
             // Статистика
             if (hatchedCountEl) animateValue(hatchedCountEl, 0, data.hatched_by_me || 0, 1000);
             if (myEggsCountEl) animateValue(myEggsCountEl, 0, data.my_eggs_hatched || 0, 1000);
+            
+            // Доступные яйца
+            const availableEggs = data.available_eggs !== undefined ? data.available_eggs : 10;
+            if (availableEggsEl) animateValue(availableEggsEl, 0, availableEggs, 1000);
             
             // Рефералы
             const referralsCount = data.referrals_count || 0;
@@ -108,10 +141,10 @@ async function loadStats() {
         console.error('Error loading stats:', error);
         if (hatchedCountEl) hatchedCountEl.textContent = '0';
         if (myEggsCountEl) myEggsCountEl.textContent = '0';
-        if (eggPointsEl) eggPointsEl.textContent = '0';
         if (hatchPointsEl) hatchPointsEl.textContent = '0';
         if (referralsCountEl) referralsCountEl.textContent = '0';
         if (referralEarningsEl) referralEarningsEl.textContent = '0';
+        if (availableEggsEl) availableEggsEl.textContent = '10';
     }
 }
 
@@ -498,6 +531,7 @@ function setupBuyEggs() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    loadUserInfo();
     loadStats();
     setupSendEggButton();
     setupSubscribeButton();
@@ -514,4 +548,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.history.length > 1) {
         tg.BackButton.show();
     }
+    
+    // Reload stats periodically to update available eggs
+    setInterval(() => {
+        loadStats();
+    }, 30000); // Every 30 seconds
 });

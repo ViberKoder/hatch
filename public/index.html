@@ -22,10 +22,6 @@
                     <span class="hatch-value" id="hatch-points">0</span>
                     <span class="hatch-label">Hatch</span>
                 </div>
-                <div class="egg-points">
-                    <span class="egg-label">Egg:</span>
-                    <span class="egg-value" id="egg-points">0</span>
-                </div>
                 <div class="send-egg-image-button" id="send-egg-image-btn">
                     <img src="https://lime-gigantic-quelea-995.mypinata.cloud/ipfs/bafkreifv4fi4p36ly3j7qsy3lg23j4cm7mcl7dqds5oa6rhxc26znfplkq" alt="Send Egg">
                 </div>
@@ -115,18 +111,18 @@
                             <div class="task-text-wrapper">
                                 <div class="task-title">Want send more eggs?</div>
                                 <div class="task-reward">100 Egg</div>
-                                <div class="task-progress" style="margin-top: 8px;">
-                                    <div style="margin-bottom: 8px;">
-                                        <label style="display: block; font-size: 14px; color: var(--text-secondary); margin-bottom: 4px;">Number of eggs (10-1000):</label>
-                                        <input type="number" id="eggs-input" min="10" max="1000" step="10" value="10" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; font-family: 'Inter', sans-serif;">
-                                    </div>
-                                    <div style="margin-top: 8px; font-size: 16px; font-weight: 600; color: #0088cc;">
-                                        Price: <span id="selected-price">0.1</span> TON
-                                    </div>
-                                </div>
                             </div>
                         </div>
-                        <button class="task-button" id="buy-eggs-button" style="background: linear-gradient(135deg, #0088cc 0%, #00d4aa 100%);">Buy</button>
+                        <div class="buy-eggs-form" style="margin-top: 12px; padding: 12px; background: #f9f9f9; border-radius: 8px;">
+                            <div style="margin-bottom: 8px;">
+                                <label style="display: block; font-size: 14px; color: var(--text-secondary); margin-bottom: 4px;">Number of eggs (10-1000):</label>
+                                <input type="number" id="eggs-input" min="10" max="1000" step="10" value="10" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; font-family: 'Inter', sans-serif;">
+                            </div>
+                            <div style="margin-top: 8px; font-size: 16px; font-weight: 600; color: #0088cc;">
+                                Price: <span id="selected-price">0.1</span> TON
+                            </div>
+                        </div>
+                        <button class="task-button" id="buy-eggs-button" style="background: linear-gradient(135deg, #0088cc 0%, #00d4aa 100%); margin-top: 12px;">Buy</button>
                     </div>
                 </div>
             </div>
@@ -142,18 +138,35 @@
             </div>
 
             <div class="profile-content">
-                <div class="info-card">
-                    <h3>How it works</h3>
-                    <p>Send eggs through @tohatchbot in any chat. Only recipients can hatch your eggs!</p>
-                    <div class="points-info">
-                        <p><strong>Earn Hatch points:</strong></p>
-                        <ul>
-                            <li>+2 Hatch when someone hatches your egg</li>
-                            <li>+1 Hatch when you hatch someone's egg</li>
-                        </ul>
+                <!-- User Info -->
+                <div class="user-info-card">
+                    <div class="user-avatar">
+                        <img id="user-avatar-img" src="" alt="User Avatar" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="user-avatar-fallback" style="display: none; width: 60px; height: 60px; border-radius: 50%; background: #0088cc; color: white; align-items: center; justify-content: center; font-size: 24px; font-weight: 600;">
+                            <span id="user-avatar-initial">?</span>
+                        </div>
+                    </div>
+                    <div class="user-details">
+                        <h3 class="user-name" id="user-name">User</h3>
+                        <div class="available-eggs">
+                            <span class="eggs-label">Available eggs:</span>
+                            <span class="eggs-value" id="available-eggs">10</span>
+                        </div>
                     </div>
                 </div>
 
+                <!-- TON Connect -->
+                <div class="ton-connect-section">
+                    <button class="ton-connect-button" id="ton-connect-manual-btn">
+                        TON Connect
+                    </button>
+                    <div id="ton-connect-btn" style="display: none;"></div>
+                    <div id="wallet-status" style="margin-top: 12px; padding: 12px; background: #f5f5f5; border-radius: 8px; display: none;">
+                        <p style="font-size: 14px; color: #666; margin: 0;">Wallet: <span id="wallet-address" style="font-family: monospace; font-size: 12px;"></span></p>
+                    </div>
+                </div>
+
+                <!-- Referral Stats -->
                 <div class="referral-stats">
                     <div class="referral-stat-item">
                         <span class="referral-label">Referrals:</span>
@@ -165,13 +178,16 @@
                     </div>
                 </div>
 
-                <div class="ton-connect-section">
-                    <button class="ton-connect-button" id="ton-connect-manual-btn" style="width: 100%; padding: 14px 20px; border: none; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; background: #0088cc; color: white; transition: all 0.2s ease;">
-                        TON Connect
-                    </button>
-                    <div id="ton-connect-btn" style="display: none;"></div>
-                    <div id="wallet-status" style="margin-top: 12px; padding: 12px; background: #f5f5f5; border-radius: 8px; display: none;">
-                        <p style="font-size: 14px; color: #666; margin: 0;">Wallet: <span id="wallet-address" style="font-family: monospace; font-size: 12px;"></span></p>
+                <!-- How it works -->
+                <div class="info-card">
+                    <h3>How it works</h3>
+                    <p>Send eggs through @tohatchbot in any chat. Only recipients can hatch your eggs!</p>
+                    <div class="points-info">
+                        <p><strong>Earn Hatch points:</strong></p>
+                        <ul>
+                            <li>+2 Hatch when someone hatches your egg</li>
+                            <li>+1 Hatch when you hatch someone's egg</li>
+                        </ul>
                     </div>
                 </div>
             </div>
