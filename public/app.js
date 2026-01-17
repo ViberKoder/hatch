@@ -31,10 +31,6 @@ const BOT_API_URL = API_URL.replace('/api/stats', '');
 // Log for debugging
 console.log('API URL:', API_URL);
 
-// TON Connect
-let tonConnectUI = null;
-let walletAddress = null;
-
 // Load statistics and points
 async function loadStats() {
     const hatchedCountEl = document.getElementById('hatched-count');
@@ -76,9 +72,6 @@ async function loadStats() {
             
             // Update task status and progress
             updateTaskStatus(data.tasks || {}, data);
-            
-            // Check payment status
-            checkPaymentStatus();
         } else {
             const errorText = await response.text();
             console.error('API error:', response.status, errorText);
@@ -89,104 +82,6 @@ async function loadStats() {
         hatchedCountEl.textContent = '0';
         myEggsCountEl.textContent = '0';
         eggPointsEl.textContent = '0';
-    }
-}
-
-// Check payment status
-async function checkPaymentStatus() {
-    const userId = getUserID();
-    if (!userId) return;
-    
-    try {
-        const response = await fetch(`${BOT_API_URL}/api/ton/payment_info?user_id=${userId}`, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Payment info:', data);
-            
-            const paymentSection = document.getElementById('payment-section');
-            
-            if (data.needs_payment) {
-                document.getElementById('ton-price').textContent = data.ton_price;
-                document.getElementById('eggs-pack-size').textContent = data.eggs_per_pack;
-                document.getElementById('pay-amount').textContent = data.ton_price;
-                
-                if (walletAddress) {
-                    paymentSection.style.display = 'block';
-                } else {
-                    paymentSection.style.display = 'none';
-                }
-            } else {
-                paymentSection.style.display = 'none';
-            }
-        }
-    } catch (error) {
-        console.error('Error checking payment status:', error);
-    }
-}
-
-// Handle TON payment
-async function handleTONPayment() {
-    const userId = getUserID();
-    if (!userId || !walletAddress) {
-        tg.showAlert('Please connect your TON wallet first in Profile page');
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${BOT_API_URL}/api/ton/payment_info?user_id=${userId}`);
-        const paymentInfo = await response.json();
-        
-        if (!paymentInfo.needs_payment) {
-            tg.showAlert('You don\'t need to pay right now');
-            return;
-        }
-        
-        const amount = paymentInfo.ton_price;
-        const wallet = paymentInfo.ton_wallet;
-        
-        const transaction = {
-            validUntil: Math.floor(Date.now() / 1000) + 360,
-            messages: [
-                {
-                    address: wallet,
-                    amount: (amount * 1000000000).toString(),
-                }
-            ]
-        };
-        
-        const result = await tonConnectUI.sendTransaction(transaction);
-        console.log('Transaction result:', result);
-        
-        const verifyResponse = await fetch(`${BOT_API_URL}/api/ton/verify_payment`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                user_id: userId,
-                tx_hash: result.boc,
-                amount: amount
-            })
-        });
-        
-        const verifyData = await verifyResponse.json();
-        
-        if (verifyResponse.ok && verifyData.success) {
-            tg.showAlert(`✅ Payment successful! You can now send ${verifyData.eggs_added} more eggs.`);
-            checkPaymentStatus();
-            loadStats();
-        } else {
-            tg.showAlert(`❌ Payment verification failed: ${verifyData.error || 'Unknown error'}`);
-        }
-    } catch (error) {
-        console.error('Error processing payment:', error);
-        tg.showAlert(`❌ Payment failed: ${error.message}`);
     }
 }
 
@@ -339,51 +234,7 @@ function setupNavigation() {
     });
 }
 
-// TON Connect
-function setupTONConnect() {
-    const tonConnectBtn = document.getElementById('ton-connect-btn');
-    if (tonConnectBtn && window.TonConnectUI) {
-        try {
-            tonConnectUI = new window.TonConnectUI({
-                manifestUrl: window.location.origin + '/tonconnect-manifest.json',
-                buttonRootId: 'ton-connect-btn'
-            });
-            
-            // Handle connection
-            tonConnectUI.onStatusChange((wallet) => {
-                if (wallet) {
-                    walletAddress = wallet.account.address;
-                    console.log('TON Wallet connected:', walletAddress);
-                    tonConnectBtn.textContent = 'Connected ✓';
-                    tonConnectBtn.disabled = true;
-                    checkPaymentStatus();
-                } else {
-                    walletAddress = null;
-                    console.log('TON Wallet disconnected');
-                    tonConnectBtn.textContent = 'Connect TON Wallet';
-                    tonConnectBtn.disabled = false;
-                }
-            });
-        } catch (error) {
-            console.error('TON Connect initialization error:', error);
-            tonConnectBtn.addEventListener('click', () => {
-                tg.showAlert('TON Connect initialization error');
-            });
-        }
-    } else if (tonConnectBtn) {
-        tonConnectBtn.addEventListener('click', () => {
-            tg.showAlert('TON Connect will be available soon!');
-        });
-    }
-}
-
-// Setup payment button
-function setupPaymentButton() {
-    const payBtn = document.getElementById('pay-ton-btn');
-    if (payBtn) {
-        payBtn.addEventListener('click', handleTONPayment);
-    }
-}
+// TON Connect - removed, now handled in bot via Web App
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -391,8 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSendEggButton();
     setupSubscribeButton();
     setupNavigation();
-    setupTONConnect();
-    setupPaymentButton();
     
     // Handle back button
     tg.BackButton.onClick(() => {
