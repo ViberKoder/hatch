@@ -9,81 +9,153 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 </head>
 <body>
     <div class="app-container">
-        <div class="header-section">
-            <div class="logo-container">
-                <div class="logo-emoji">🥚</div>
-            </div>
-            <h1 class="main-title">Hatch</h1>
-            <p class="subtitle">Your egg hatching statistics</p>
-        </div>
-
-        <div class="stats-container">
-            <div class="stat-card hatched-card">
-                <div class="stat-header">
-                    <div class="stat-icon">🐣</div>
-                    <div class="stat-info">
-                        <div class="stat-label">Hatched</div>
-                        <div class="stat-value" id="hatched-count">0</div>
-                    </div>
+        <!-- Home Page -->
+        <div class="page active" id="page-home">
+            <div class="header-section">
+                <div class="image-container">
+                    <img src="https://em-content.zobj.net/source/telegram/386/hatching-chick_1f423.webp" alt="Hatching Chick" class="main-image">
                 </div>
-                <div class="stat-description">Eggs you've hatched</div>
-            </div>
-
-            <div class="stat-card received-card">
-                <div class="stat-header">
-                    <div class="stat-icon">🥚</div>
-                    <div class="stat-info">
-                        <div class="stat-label">Your Eggs</div>
-                        <div class="stat-value" id="my-eggs-count">0</div>
-                    </div>
+                <div class="egg-points">
+                    <span class="egg-label">Egg:</span>
+                    <span class="egg-value" id="egg-points">0</span>
                 </div>
-                <div class="stat-description">Your eggs hatched by others</div>
+                <div class="send-egg-image-button" id="send-egg-image-btn">
+                    <img src="https://lime-gigantic-quelea-995.mypinata.cloud/ipfs/bafkreifv4fi4p36ly3j7qsy3lg23j4cm7mcl7dqds5oa6rhxc26znfplkq" alt="Send Egg">
+                </div>
             </div>
-        </div>
 
-        <div class="actions-section">
-            <button class="action-button primary" id="send-egg-btn">
-                <span class="button-icon">🥚</span>
-                <span class="button-text">Send Egg</span>
-            </button>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-text">Eggs you've hatched:</span>
+                    <span class="stat-value" id="hatched-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-text">Your eggs hatched by others:</span>
+                    <span class="stat-value" id="my-eggs-count">0</span>
+                </div>
+            </div>
             
-            <!-- TON Connect Button -->
-            <div id="ton-connect-section" style="display: none;">
-                <button class="action-button ton-connect" id="ton-connect-btn">
-                    <span class="button-icon">💎</span>
-                    <span class="button-text">Connect TON Wallet</span>
+            <!-- Payment Section (shown when needed) -->
+            <div id="payment-section" style="display: none; margin-top: 24px; padding: 16px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color);">
+                <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">💳 Pay for More Eggs</h3>
+                <p style="font-family: 'Inter', sans-serif; color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">You've used all free eggs today. Pay <strong id="ton-price">0.1</strong> TON for <strong id="eggs-pack-size">10</strong> more eggs.</p>
+                <button class="ton-connect-button" id="pay-ton-btn" style="width: 100%;">
+                    Pay <span id="pay-amount">0.1</span> TON
                 </button>
             </div>
-            
-            <!-- Payment Section -->
-            <div id="payment-section" style="display: none;">
-                <div class="payment-card">
-                    <h3>💳 Pay for More Eggs</h3>
-                    <p>You've used all free eggs today. Pay <strong id="ton-price">0.1</strong> TON for <strong id="eggs-pack-size">10</strong> more eggs.</p>
-                    <button class="action-button primary" id="pay-ton-btn">
-                        <span class="button-icon">💎</span>
-                        <span class="button-text">Pay <span id="pay-amount">0.1</span> TON</span>
+        </div>
+
+        <!-- More Egg Page -->
+        <div class="page" id="page-more-egg">
+            <div class="page-header">
+                <div class="page-icon">
+                    <img src="https://em-content.zobj.net/source/telegram/386/chart-increasing_1f4c8.webp" alt="More Egg">
+                </div>
+                <h2 class="page-title">More Egg</h2>
+            </div>
+
+            <div class="tasks-container">
+                <div class="task-card" id="task-subscribe">
+                    <div class="task-shape"></div>
+                    <div class="task-content-wrapper">
+                        <div class="task-content-top">
+                            <div class="task-avatar">
+                                <img src="https://optim.tildacdn.com/tild3961-3964-4138-b064-643064356331/-/resize/138x/-/format/webp/photo.png.webp" alt="Cocoin" class="task-avatar-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <span class="task-avatar-fallback" style="display:none; font-size: 32px;">📢</span>
+                            </div>
+                            <div class="task-text-wrapper">
+                                <div class="task-title">Cocoin follow</div>
+                                <div class="task-reward">333 Egg</div>
+                            </div>
+                        </div>
+                        <button class="task-button subscribe-button" id="subscribe-button">Take Egg</button>
+                    </div>
+                </div>
+
+                <div class="task-card" id="task-hatch-100">
+                    <div class="task-shape"></div>
+                    <div class="task-content-wrapper">
+                        <div class="task-content-top">
+                            <div class="task-avatar">
+                                <span style="font-size: 32px;">🐣</span>
+                            </div>
+                            <div class="task-text-wrapper">
+                                <div class="task-title">Hatch 100 egg</div>
+                                <div class="task-reward">500 Egg</div>
+                                <div class="task-progress" id="hatch-progress">0 / 100</div>
+                            </div>
+                        </div>
+                        <button class="task-button" id="hatch-100-button" disabled>In Progress</button>
+                    </div>
+                </div>
+
+                <div class="task-card" id="task-send-100">
+                    <div class="task-shape"></div>
+                    <div class="task-content-wrapper">
+                        <div class="task-content-top">
+                            <div class="task-avatar">
+                                <span style="font-size: 32px;">🥚</span>
+                            </div>
+                            <div class="task-text-wrapper">
+                                <div class="task-title">Send 100 egg</div>
+                                <div class="task-reward">500 Egg</div>
+                                <div class="task-progress" id="send-progress">0 / 100</div>
+                            </div>
+                        </div>
+                        <button class="task-button" id="send-100-button" disabled>In Progress</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div class="page" id="page-profile">
+            <div class="page-header">
+                <div class="page-icon">
+                    <img src="https://em-content.zobj.net/source/telegram/386/front-facing-baby-chick_1f425.webp" alt="Profile">
+                </div>
+                <h2 class="page-title">Profile</h2>
+            </div>
+
+            <div class="profile-content">
+                <div class="info-card">
+                    <h3>How it works</h3>
+                    <p>Send eggs through @tohatchbot in any chat. Only recipients can hatch your eggs!</p>
+                    <div class="points-info">
+                        <p><strong>Earn Egg points:</strong></p>
+                        <ul>
+                            <li>+2 Egg when someone hatches your egg</li>
+                            <li>+1 Egg when you hatch someone's egg</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="ton-connect-section">
+                    <button class="ton-connect-button" id="ton-connect-btn">
+                        Connect TON Wallet
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="info-section">
-            <div class="info-card">
-                <h3>How it works</h3>
-                <p>Send eggs through @tohatchbot in any chat. Only recipients can hatch your eggs!</p>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>Powered by TON</p>
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <button class="nav-item" data-page="more-egg">
+                <img src="https://em-content.zobj.net/source/telegram/386/chart-increasing_1f4c8.webp" alt="More Egg" class="nav-icon-image">
+            </button>
+            <button class="nav-item center-nav active" data-page="home">
+                <img src="https://em-content.zobj.net/source/telegram/386/hatching-chick_1f423.webp" alt="Home" class="nav-icon-image">
+            </button>
+            <button class="nav-item" data-page="profile">
+                <img src="https://em-content.zobj.net/source/telegram/386/front-facing-baby-chick_1f425.webp" alt="Profile" class="nav-icon-image">
+            </button>
         </div>
     </div>
 
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
