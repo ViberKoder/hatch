@@ -26,9 +26,14 @@ function getUserID() {
 
 // API endpoint
 const API_URL = 'https://web-production-11ef2.up.railway.app/api/stats';
+const BOT_API_URL = API_URL.replace('/api/stats', '');
 
 // Log for debugging
 console.log('API URL:', API_URL);
+
+// TON Connect
+let tonConnectUI = null;
+let walletAddress = null;
 
 // Load statistics and points
 async function loadStats() {
@@ -90,11 +95,13 @@ function updateTaskStatus(tasks, data) {
     const subscribeButton = document.getElementById('subscribe-button');
     const subscribeTask = document.getElementById('task-subscribe');
     
-    if (tasks.subscribed_to_cocoin) {
-        subscribeButton.textContent = 'Subscribed ✓';
-        subscribeButton.classList.add('completed');
-        subscribeButton.disabled = true;
-        subscribeTask.style.opacity = '0.7';
+    if (subscribeButton && subscribeTask) {
+        if (tasks.subscribed_to_cocoin) {
+            subscribeButton.textContent = 'Subscribed ✓';
+            subscribeButton.classList.add('completed');
+            subscribeButton.disabled = true;
+            subscribeTask.style.opacity = '0.7';
+        }
     }
     
     // Hatch 100 egg task
@@ -107,14 +114,16 @@ function updateTaskStatus(tasks, data) {
         hatchProgress.textContent = `${Math.min(hatchedCount, 100)} / 100`;
     }
     
-    if (tasks.hatch_100_eggs) {
-        hatch100Button.textContent = 'Completed ✓';
-        hatch100Button.classList.add('completed');
-        hatch100Button.disabled = true;
-        hatch100Task.style.opacity = '0.7';
-    } else {
-        hatch100Button.textContent = 'In Progress';
-        hatch100Button.disabled = true;
+    if (hatch100Button && hatch100Task) {
+        if (tasks.hatch_100_eggs) {
+            hatch100Button.textContent = 'Completed ✓';
+            hatch100Button.classList.add('completed');
+            hatch100Button.disabled = true;
+            hatch100Task.style.opacity = '0.7';
+        } else {
+            hatch100Button.textContent = 'In Progress';
+            hatch100Button.disabled = true;
+        }
     }
     
     // Send 100 egg task
@@ -127,14 +136,16 @@ function updateTaskStatus(tasks, data) {
         sendProgress.textContent = `${Math.min(sentCount, 100)} / 100`;
     }
     
-    if (tasks.send_100_eggs) {
-        send100Button.textContent = 'Completed ✓';
-        send100Button.classList.add('completed');
-        send100Button.disabled = true;
-        send100Task.style.opacity = '0.7';
-    } else {
-        send100Button.textContent = 'In Progress';
-        send100Button.disabled = true;
+    if (send100Button && send100Task) {
+        if (tasks.send_100_eggs) {
+            send100Button.textContent = 'Completed ✓';
+            send100Button.classList.add('completed');
+            send100Button.disabled = true;
+            send100Task.style.opacity = '0.7';
+        } else {
+            send100Button.textContent = 'In Progress';
+            send100Button.disabled = true;
+        }
     }
 }
 
@@ -187,7 +198,7 @@ async function checkSubscription() {
     if (!userId) return;
     
     try {
-        const response = await fetch(`${API_URL.replace('/api/stats', '')}/api/stats/check_subscription?user_id=${userId}`, {
+        const response = await fetch(`${BOT_API_URL}/api/stats/check_subscription?user_id=${userId}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -233,7 +244,134 @@ function setupNavigation() {
     });
 }
 
-// TON Connect - removed, now handled in bot via Web App
+// TON Connect Setup
+function setupTONConnect() {
+    const tonConnectBtn = document.getElementById('ton-connect-btn');
+    const walletStatus = document.getElementById('wallet-status');
+    const walletAddressEl = document.getElementById('wallet-address');
+    
+    if (tonConnectBtn && window.TonConnectUI) {
+        try {
+            tonConnectUI = new window.TonConnectUI({
+                manifestUrl: window.location.origin + '/tonconnect-manifest.json',
+                buttonRootId: 'ton-connect-btn'
+            });
+            
+            // Handle connection
+            tonConnectUI.onStatusChange((wallet) => {
+                if (wallet) {
+                    walletAddress = wallet.account.address;
+                    console.log('TON Wallet connected:', walletAddress);
+                    
+                    // Show wallet status
+                    if (walletStatus && walletAddressEl) {
+                        walletStatus.style.display = 'block';
+                        walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
+                    }
+                } else {
+                    walletAddress = null;
+                    console.log('TON Wallet disconnected');
+                    
+                    // Hide wallet status
+                    if (walletStatus) {
+                        walletStatus.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Check if already connected
+            tonConnectUI.connectionRestored.then(() => {
+                if (tonConnectUI.wallet?.account) {
+                    walletAddress = tonConnectUI.wallet.account.address;
+                    if (walletStatus && walletAddressEl) {
+                        walletStatus.style.display = 'block';
+                        walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('TON Connect initialization error:', error);
+        }
+    }
+}
+
+// Setup Buy Eggs
+function setupBuyEggs() {
+    const slider = document.getElementById('eggs-slider');
+    const selectedEggs = document.getElementById('selected-eggs');
+    const selectedPrice = document.getElementById('selected-price');
+    const buyButton = document.getElementById('buy-eggs-button');
+    
+    if (!slider || !selectedEggs || !selectedPrice || !buyButton) return;
+    
+    // Update display when slider changes
+    slider.addEventListener('input', (e) => {
+        const eggs = parseInt(e.target.value);
+        const price = (eggs / 10) * 0.1; // 10 eggs = 0.1 TON
+        
+        selectedEggs.textContent = `${eggs} eggs`;
+        selectedPrice.textContent = price.toFixed(1);
+    });
+    
+    // Handle buy button
+    buyButton.addEventListener('click', async () => {
+        if (!walletAddress) {
+            tg.showAlert('Please connect your TON wallet first in Profile page');
+            return;
+        }
+        
+        const eggs = parseInt(slider.value);
+        const amount = (eggs / 10) * 0.1; // 10 eggs = 0.1 TON
+        const wallet = 'UQCHdlQ2TLpa6Kpu5Pu8HeJd1xe3EL1Kx2wFekeuOnSpFcP0';
+        
+        const transaction = {
+            validUntil: Math.floor(Date.now() / 1000) + 360,
+            messages: [
+                {
+                    address: wallet,
+                    amount: (amount * 1000000000).toString(), // Convert to nanotons
+                }
+            ]
+        };
+        
+        try {
+            buyButton.disabled = true;
+            buyButton.textContent = 'Processing...';
+            
+            const result = await tonConnectUI.sendTransaction(transaction);
+            console.log('Transaction result:', result);
+            
+            // Verify payment
+            const userId = getUserID();
+            const verifyResponse = await fetch(`${BOT_API_URL}/api/ton/verify_payment`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    tx_hash: result.boc,
+                    amount: amount
+                })
+            });
+            
+            const verifyData = await verifyResponse.json();
+            
+            if (verifyResponse.ok && verifyData.success) {
+                tg.showAlert(`✅ Payment successful! You can now send ${verifyData.eggs_added} more eggs.`);
+                loadStats();
+            } else {
+                tg.showAlert(`❌ Payment verification failed: ${verifyData.error || 'Unknown error'}`);
+            }
+        } catch (error) {
+            console.error('Error processing payment:', error);
+            tg.showAlert(`❌ Payment failed: ${error.message}`);
+        } finally {
+            buyButton.disabled = false;
+            buyButton.textContent = 'Buy Eggs';
+        }
+    });
+}
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -241,6 +379,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSendEggButton();
     setupSubscribeButton();
     setupNavigation();
+    setupTONConnect();
+    setupBuyEggs();
     
     // Handle back button
     tg.BackButton.onClick(() => {
@@ -250,13 +390,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show back button if needed
     if (window.history.length > 1) {
         tg.BackButton.show();
-    }
-    
-    // Check if we need to show payment UI from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('pay') === 'true') {
-        setTimeout(() => {
-            checkPaymentStatus();
-        }, 1500);
     }
 });

@@ -100,6 +100,34 @@
                         <button class="task-button" id="send-100-button" disabled>In Progress</button>
                     </div>
                 </div>
+
+                <!-- Buy Eggs Section -->
+                <div class="task-card" id="buy-eggs-card" style="margin-top: 20px;">
+                    <div class="task-shape"></div>
+                    <div class="task-content-wrapper">
+                        <div class="task-content-top">
+                            <div class="task-avatar">
+                                <span style="font-size: 32px;">💎</span>
+                            </div>
+                            <div class="task-text-wrapper">
+                                <div class="task-title">Buy Eggs</div>
+                                <div class="task-reward" style="color: #0088cc;">10 eggs = 0.1 TON</div>
+                                <div class="task-progress" style="margin-top: 8px;">
+                                    <input type="range" id="eggs-slider" min="10" max="1000" step="10" value="10" style="width: 100%; margin: 8px 0;">
+                                    <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--text-secondary);">
+                                        <span>10 eggs</span>
+                                        <span id="selected-eggs">10 eggs</span>
+                                        <span>1000 eggs</span>
+                                    </div>
+                                    <div style="margin-top: 8px; font-size: 16px; font-weight: 600; color: #0088cc;">
+                                        Price: <span id="selected-price">0.1</span> TON
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="task-button" id="buy-eggs-button" style="background: linear-gradient(135deg, #0088cc 0%, #00d4aa 100%);">Buy Eggs</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -125,6 +153,12 @@
                     </div>
                 </div>
 
+                <div class="ton-connect-section">
+                    <div id="ton-connect-btn"></div>
+                    <div id="wallet-status" style="margin-top: 12px; padding: 12px; background: #f5f5f5; border-radius: 8px; display: none;">
+                        <p style="font-size: 14px; color: #666; margin: 0;">Wallet: <span id="wallet-address" style="font-family: monospace; font-size: 12px;"></span></p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -142,6 +176,7 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
