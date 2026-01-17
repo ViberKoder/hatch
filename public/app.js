@@ -26,7 +26,6 @@ function getUserID() {
 
 // API endpoint
 const API_URL = 'https://web-production-11ef2.up.railway.app/api/stats';
-const BOT_API_URL = API_URL.replace('/api/stats', '');
 
 // Log for debugging
 console.log('API URL:', API_URL);
@@ -188,7 +187,7 @@ async function checkSubscription() {
     if (!userId) return;
     
     try {
-        const response = await fetch(`${BOT_API_URL}/api/stats/check_subscription?user_id=${userId}`, {
+        const response = await fetch(`${API_URL.replace('/api/stats', '')}/api/stats/check_subscription?user_id=${userId}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
