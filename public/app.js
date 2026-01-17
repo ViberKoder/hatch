@@ -251,101 +251,99 @@ function setupTONConnect() {
     const walletStatus = document.getElementById('wallet-status');
     const walletAddressEl = document.getElementById('wallet-address');
     
-    // Check if TON Connect UI is loaded
-    if (typeof TON_CONNECT_UI === 'undefined' && typeof window.TON_CONNECT_UI === 'undefined') {
-        console.error('TON Connect UI not loaded');
-        if (tonConnectManualBtn) {
-            tonConnectManualBtn.addEventListener('click', () => {
-                tg.showAlert('TON Connect is loading... Please wait and refresh the page.');
-            });
+    // Wait for TON Connect UI to load
+    function initTONConnect() {
+        // Check if TON Connect UI is loaded (according to docs: TON_CONNECT_UI.TonConnectUI)
+        if (typeof window.TON_CONNECT_UI === 'undefined' || !window.TON_CONNECT_UI.TonConnectUI) {
+            console.error('TON Connect UI not loaded, retrying...');
+            setTimeout(initTONConnect, 500);
+            return;
         }
-        return;
-    }
-    
-    // Use correct namespace for TON Connect UI
-    const TonConnectUI = window.TON_CONNECT_UI?.TonConnectUI || TON_CONNECT_UI?.TonConnectUI;
-    
-    if (!TonConnectUI) {
-        console.error('TonConnectUI constructor not found');
-        return;
-    }
-    
-    // Initialize TON Connect UI (hidden button for automatic connection)
-    try {
-        tonConnectUI = new TonConnectUI({
-            manifestUrl: window.location.origin + '/tonconnect-manifest.json',
-            buttonRootId: 'ton-connect-btn'
-        });
         
-        // Handle connection
-        tonConnectUI.onStatusChange((wallet) => {
-            if (wallet) {
-                walletAddress = wallet.account.address;
-                console.log('TON Wallet connected:', walletAddress);
-                
-                // Update manual button
-                if (tonConnectManualBtn) {
-                    tonConnectManualBtn.textContent = 'Connected ✓';
-                    tonConnectManualBtn.style.background = '#00d4aa';
-                    tonConnectManualBtn.disabled = true;
+        // Initialize TON Connect UI (hidden button for automatic connection)
+        try {
+            tonConnectUI = new window.TON_CONNECT_UI.TonConnectUI({
+                manifestUrl: window.location.origin + '/tonconnect-manifest.json',
+                buttonRootId: 'ton-connect-btn'
+            });
+            
+            console.log('TON Connect UI initialized');
+            
+            // Handle connection
+            tonConnectUI.onStatusChange((wallet) => {
+                if (wallet) {
+                    walletAddress = wallet.account.address;
+                    console.log('TON Wallet connected:', walletAddress);
+                    
+                    // Update manual button
+                    if (tonConnectManualBtn) {
+                        tonConnectManualBtn.textContent = 'Connected ✓';
+                        tonConnectManualBtn.style.background = '#00d4aa';
+                        tonConnectManualBtn.disabled = true;
+                    }
+                    
+                    // Show wallet status
+                    if (walletStatus && walletAddressEl) {
+                        walletStatus.style.display = 'block';
+                        walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
+                    }
+                } else {
+                    walletAddress = null;
+                    console.log('TON Wallet disconnected');
+                    
+                    // Update manual button
+                    if (tonConnectManualBtn) {
+                        tonConnectManualBtn.textContent = 'Connect TON Wallet';
+                        tonConnectManualBtn.style.background = '#0088cc';
+                        tonConnectManualBtn.disabled = false;
+                    }
+                    
+                    // Hide wallet status
+                    if (walletStatus) {
+                        walletStatus.style.display = 'none';
+                    }
                 }
-                
-                // Show wallet status
-                if (walletStatus && walletAddressEl) {
-                    walletStatus.style.display = 'block';
-                    walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
+            });
+            
+            // Check if already connected
+            tonConnectUI.connectionRestored.then(() => {
+                if (tonConnectUI.wallet?.account) {
+                    walletAddress = tonConnectUI.wallet.account.address;
+                    if (tonConnectManualBtn) {
+                        tonConnectManualBtn.textContent = 'Connected ✓';
+                        tonConnectManualBtn.style.background = '#00d4aa';
+                        tonConnectManualBtn.disabled = true;
+                    }
+                    if (walletStatus && walletAddressEl) {
+                        walletStatus.style.display = 'block';
+                        walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
+                    }
                 }
-            } else {
-                walletAddress = null;
-                console.log('TON Wallet disconnected');
-                
-                // Update manual button
-                if (tonConnectManualBtn) {
-                    tonConnectManualBtn.textContent = 'Connect TON Wallet';
-                    tonConnectManualBtn.style.background = '#0088cc';
-                    tonConnectManualBtn.disabled = false;
-                }
-                
-                // Hide wallet status
-                if (walletStatus) {
-                    walletStatus.style.display = 'none';
-                }
+            }).catch(err => {
+                console.log('No existing connection:', err);
+            });
+            
+            // Manual button click - open TON Connect modal
+            if (tonConnectManualBtn) {
+                tonConnectManualBtn.addEventListener('click', () => {
+                    if (!walletAddress && tonConnectUI) {
+                        // Open TON Connect modal
+                        tonConnectUI.openModal();
+                    }
+                });
             }
-        });
-        
-        // Check if already connected
-        tonConnectUI.connectionRestored.then(() => {
-            if (tonConnectUI.wallet?.account) {
-                walletAddress = tonConnectUI.wallet.account.address;
-                if (tonConnectManualBtn) {
-                    tonConnectManualBtn.textContent = 'Connected ✓';
-                    tonConnectManualBtn.style.background = '#00d4aa';
-                    tonConnectManualBtn.disabled = true;
-                }
-                if (walletStatus && walletAddressEl) {
-                    walletStatus.style.display = 'block';
-                    walletAddressEl.textContent = walletAddress.substring(0, 6) + '...' + walletAddress.substring(walletAddress.length - 4);
-                }
+        } catch (error) {
+            console.error('TON Connect initialization error:', error);
+            if (tonConnectManualBtn) {
+                tonConnectManualBtn.addEventListener('click', () => {
+                    tg.showAlert('TON Connect error: ' + error.message);
+                });
             }
-        });
-        
-        // Manual button click - open TON Connect modal
-        if (tonConnectManualBtn) {
-            tonConnectManualBtn.addEventListener('click', () => {
-                if (!walletAddress && tonConnectUI) {
-                    // Open TON Connect modal
-                    tonConnectUI.openModal();
-                }
-            });
-        }
-    } catch (error) {
-        console.error('TON Connect initialization error:', error);
-        if (tonConnectManualBtn) {
-            tonConnectManualBtn.addEventListener('click', () => {
-                tg.showAlert('TON Connect initialization error: ' + error.message);
-            });
         }
     }
+    
+    // Start initialization
+    initTONConnect();
 }
 
 // Setup Buy Eggs
