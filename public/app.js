@@ -114,21 +114,53 @@ async function loadStats() {
             
             // Hatch points = вылупленные яйца (hatched_by_me)
             const hatchPoints = data.hatched_by_me || 0;
-            if (hatchPointsEl) animateValue(hatchPointsEl, 0, hatchPoints, 1000);
+            if (hatchPointsEl) {
+                const currentValue = parseInt(hatchPointsEl.textContent) || 0;
+                if (currentValue !== hatchPoints) {
+                    animateValue(hatchPointsEl, currentValue, hatchPoints, 500);
+                }
+            }
             
             // Статистика
-            if (hatchedCountEl) animateValue(hatchedCountEl, 0, data.hatched_by_me || 0, 1000);
-            if (myEggsCountEl) animateValue(myEggsCountEl, 0, data.my_eggs_hatched || 0, 1000);
+            if (hatchedCountEl) {
+                const currentValue = parseInt(hatchedCountEl.textContent) || 0;
+                const newValue = data.hatched_by_me || 0;
+                if (currentValue !== newValue) {
+                    animateValue(hatchedCountEl, currentValue, newValue, 500);
+                }
+            }
+            if (myEggsCountEl) {
+                const currentValue = parseInt(myEggsCountEl.textContent) || 0;
+                const newValue = data.my_eggs_hatched || 0;
+                if (currentValue !== newValue) {
+                    animateValue(myEggsCountEl, currentValue, newValue, 500);
+                }
+            }
             
             // Доступные яйца
             const availableEggs = data.available_eggs !== undefined ? data.available_eggs : 10;
-            if (availableEggsEl) animateValue(availableEggsEl, 0, availableEggs, 1000);
+            if (availableEggsEl) {
+                const currentValue = parseInt(availableEggsEl.textContent) || 10;
+                if (currentValue !== availableEggs) {
+                    animateValue(availableEggsEl, currentValue, availableEggs, 500);
+                }
+            }
             
             // Рефералы
             const referralsCount = data.referrals_count || 0;
             const referralEarnings = data.referral_earnings || 0;
-            if (referralsCountEl) animateValue(referralsCountEl, 0, referralsCount, 1000);
-            if (referralEarningsEl) animateValue(referralEarningsEl, 0, referralEarnings, 1000);
+            if (referralsCountEl) {
+                const currentValue = parseInt(referralsCountEl.textContent) || 0;
+                if (currentValue !== referralsCount) {
+                    animateValue(referralsCountEl, currentValue, referralsCount, 500);
+                }
+            }
+            if (referralEarningsEl) {
+                const currentValue = parseInt(referralEarningsEl.textContent) || 0;
+                if (currentValue !== referralEarnings) {
+                    animateValue(referralEarningsEl, currentValue, referralEarnings, 500);
+                }
+            }
             
             // Update task status and progress
             updateTaskStatus(data.tasks || {}, data);
