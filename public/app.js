@@ -251,19 +251,28 @@ function setupTONConnect() {
     const walletStatus = document.getElementById('wallet-status');
     const walletAddressEl = document.getElementById('wallet-address');
     
-    if (!window.TonConnectUI) {
+    // Check if TON Connect UI is loaded
+    if (typeof TON_CONNECT_UI === 'undefined' && typeof window.TON_CONNECT_UI === 'undefined') {
         console.error('TON Connect UI not loaded');
         if (tonConnectManualBtn) {
             tonConnectManualBtn.addEventListener('click', () => {
-                tg.showAlert('TON Connect is loading... Please wait.');
+                tg.showAlert('TON Connect is loading... Please wait and refresh the page.');
             });
         }
         return;
     }
     
-    // Initialize TON Connect UI (hidden button)
+    // Use correct namespace for TON Connect UI
+    const TonConnectUI = window.TON_CONNECT_UI?.TonConnectUI || TON_CONNECT_UI?.TonConnectUI;
+    
+    if (!TonConnectUI) {
+        console.error('TonConnectUI constructor not found');
+        return;
+    }
+    
+    // Initialize TON Connect UI (hidden button for automatic connection)
     try {
-        tonConnectUI = new window.TonConnectUI({
+        tonConnectUI = new TonConnectUI({
             manifestUrl: window.location.origin + '/tonconnect-manifest.json',
             buttonRootId: 'ton-connect-btn'
         });
@@ -320,18 +329,12 @@ function setupTONConnect() {
             }
         });
         
-        // Manual button click - trigger TON Connect
+        // Manual button click - open TON Connect modal
         if (tonConnectManualBtn) {
             tonConnectManualBtn.addEventListener('click', () => {
                 if (!walletAddress && tonConnectUI) {
-                    // Trigger TON Connect by clicking the hidden button
-                    const hiddenBtn = document.querySelector('#ton-connect-btn button');
-                    if (hiddenBtn) {
-                        hiddenBtn.click();
-                    } else {
-                        // Fallback: try to open TON Connect
-                        tonConnectUI.openModal();
-                    }
+                    // Open TON Connect modal
+                    tonConnectUI.openModal();
                 }
             });
         }
@@ -339,7 +342,7 @@ function setupTONConnect() {
         console.error('TON Connect initialization error:', error);
         if (tonConnectManualBtn) {
             tonConnectManualBtn.addEventListener('click', () => {
-                tg.showAlert('TON Connect initialization error. Please refresh the page.');
+                tg.showAlert('TON Connect initialization error: ' + error.message);
             });
         }
     }
