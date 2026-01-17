@@ -184,6 +184,67 @@ function updateUI() {
     checkPaymentStatus();
 }
 
+// Navigation
+let currentPage = 'home-page';
+
+function showPage(pageId) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    
+    // Show selected page
+    const page = document.getElementById(pageId);
+    if (page) {
+        page.classList.add('active');
+        currentPage = pageId;
+    }
+    
+    // Update nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.page === pageId) {
+            item.classList.add('active');
+        }
+    });
+    
+    // Update Telegram back button
+    if (pageId === 'home-page') {
+        tg.BackButton.hide();
+    } else {
+        tg.BackButton.show();
+    }
+    
+    // Update stats on stats page
+    if (pageId === 'stats-page') {
+        updateStatsPage();
+    }
+}
+
+function setupNavigation() {
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const pageId = item.dataset.page;
+            showPage(pageId);
+        });
+    });
+}
+
+// Update stats on stats page
+function updateStatsPage() {
+    const hatchedCountStats = document.getElementById('hatched-count-stats');
+    const myEggsCountStats = document.getElementById('my-eggs-count-stats');
+    const hatchedCount = document.getElementById('hatched-count');
+    const myEggsCount = document.getElementById('my-eggs-count');
+    
+    if (hatchedCountStats && hatchedCount) {
+        hatchedCountStats.textContent = hatchedCount.textContent;
+    }
+    if (myEggsCountStats && myEggsCount) {
+        myEggsCountStats.textContent = myEggsCount.textContent;
+    }
+}
+
 // Load statistics
 async function loadStats() {
     const hatchedCountEl = document.getElementById('hatched-count');
@@ -193,14 +254,15 @@ async function loadStats() {
     
     if (!userId) {
         console.warn('No user ID found');
-        hatchedCountEl.textContent = '0';
-        myEggsCountEl.textContent = '0';
+        if (hatchedCountEl) hatchedCountEl.textContent = '0';
+        if (myEggsCountEl) myEggsCountEl.textContent = '0';
+        updateStatsPage();
         return;
     }
     
     // Show loading
-    hatchedCountEl.innerHTML = '<span class="loading"></span>';
-    myEggsCountEl.innerHTML = '<span class="loading"></span>';
+    if (hatchedCountEl) hatchedCountEl.innerHTML = '<span class="loading"></span>';
+    if (myEggsCountEl) myEggsCountEl.innerHTML = '<span class="loading"></span>';
     
     try {
         console.log(`Fetching stats from: ${API_URL}?user_id=${userId}`);
@@ -216,8 +278,20 @@ async function loadStats() {
         if (response.ok) {
             const data = await response.json();
             console.log('Stats data:', data);
-            animateValue(hatchedCountEl, 0, data.hatched_by_me || 0, 1000);
-            animateValue(myEggsCountEl, 0, data.my_eggs_hatched || 0, 1000);
+            const hatchedValue = data.hatched_by_me || 0;
+            const myEggsValue = data.my_eggs_hatched || 0;
+            
+            if (hatchedCountEl) {
+                animateValue(hatchedCountEl, 0, hatchedValue, 1000);
+            }
+            if (myEggsCountEl) {
+                animateValue(myEggsCountEl, 0, myEggsValue, 1000);
+            }
+            
+            // Update stats page after animation
+            setTimeout(() => {
+                updateStatsPage();
+            }, 1000);
         } else {
             const errorText = await response.text();
             console.error('API error:', response.status, errorText);
@@ -225,8 +299,9 @@ async function loadStats() {
         }
     } catch (error) {
         console.error('Error loading stats:', error);
-        hatchedCountEl.textContent = '0';
-        myEggsCountEl.textContent = '0';
+        if (hatchedCountEl) hatchedCountEl.textContent = '0';
+        if (myEggsCountEl) myEggsCountEl.textContent = '0';
+        updateStatsPage();
     }
 }
 
@@ -267,6 +342,12 @@ function setupPaymentButton() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Setup navigation
+    setupNavigation();
+    
+    // Show home page by default
+    showPage('home-page');
+    
     loadStats();
     setupSendEggButton();
     setupPaymentButton();
@@ -281,11 +362,16 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Handle back button
     tg.BackButton.onClick(() => {
-        tg.close();
+        if (currentPage !== 'home-page') {
+            showPage('home-page');
+            tg.BackButton.hide();
+        } else {
+            tg.close();
+        }
     });
     
-    // Show back button if needed
-    if (window.history.length > 1) {
+    // Show back button only if not on home page
+    if (currentPage !== 'home-page') {
         tg.BackButton.show();
     }
     

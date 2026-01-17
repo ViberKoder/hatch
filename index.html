@@ -13,75 +13,154 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="header-section">
-            <div class="logo-container">
-                <div class="logo-emoji">🥚</div>
-            </div>
-            <h1 class="main-title">Hatch</h1>
-            <p class="subtitle">Your egg hatching statistics</p>
-        </div>
-
-        <div class="stats-container">
-            <div class="stat-card hatched-card">
-                <div class="stat-header">
-                    <div class="stat-icon">🐣</div>
-                    <div class="stat-info">
-                        <div class="stat-label">Hatched</div>
-                        <div class="stat-value" id="hatched-count">0</div>
-                    </div>
+        <!-- Home Page -->
+        <div class="page active" id="home-page">
+            <div class="header-section">
+                <div class="logo-container">
+                    <div class="logo-emoji">🥚</div>
                 </div>
-                <div class="stat-description">Eggs you've hatched</div>
+                <h1 class="main-title">Hatch</h1>
+                <p class="subtitle">Your egg hatching statistics</p>
             </div>
 
-            <div class="stat-card received-card">
-                <div class="stat-header">
-                    <div class="stat-icon">🥚</div>
-                    <div class="stat-info">
-                        <div class="stat-label">Your Eggs</div>
-                        <div class="stat-value" id="my-eggs-count">0</div>
+            <div class="stats-container">
+                <div class="stat-card hatched-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🐣</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Hatched</div>
+                            <div class="stat-value" id="hatched-count">0</div>
+                        </div>
                     </div>
+                    <div class="stat-description">Eggs you've hatched</div>
                 </div>
-                <div class="stat-description">Your eggs hatched by others</div>
-            </div>
-        </div>
 
-        <div class="actions-section">
-            <button class="action-button primary" id="send-egg-btn">
-                <span class="button-icon">🥚</span>
-                <span class="button-text">Send Egg</span>
-            </button>
-            
-            <!-- TON Connect Button -->
-            <div id="ton-connect-section" style="display: none;">
-                <button class="action-button ton-connect" id="ton-connect-btn">
-                    <span class="button-icon">💎</span>
-                    <span class="button-text">Connect TON Wallet</span>
+                <div class="stat-card received-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🥚</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Your Eggs</div>
+                            <div class="stat-value" id="my-eggs-count">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-description">Your eggs hatched by others</div>
+                </div>
+            </div>
+
+            <div class="actions-section">
+                <button class="action-button primary" id="send-egg-btn">
+                    <span class="button-icon">🥚</span>
+                    <span class="button-text">Send Egg</span>
                 </button>
-            </div>
-            
-            <!-- Payment Section -->
-            <div id="payment-section" style="display: none;">
-                <div class="payment-card">
-                    <h3>💳 Pay for More Eggs</h3>
-                    <p>You've used all free eggs today. Pay <strong id="ton-price">0.1</strong> TON for <strong id="eggs-pack-size">10</strong> more eggs.</p>
-                    <button class="action-button primary" id="pay-ton-btn">
+                
+                <!-- TON Connect Button -->
+                <div id="ton-connect-section" style="display: none;">
+                    <button class="action-button ton-connect" id="ton-connect-btn">
                         <span class="button-icon">💎</span>
-                        <span class="button-text">Pay <span id="pay-amount">0.1</span> TON</span>
+                        <span class="button-text">Connect TON Wallet</span>
                     </button>
                 </div>
+                
+                <!-- Payment Section -->
+                <div id="payment-section" style="display: none;">
+                    <div class="payment-card">
+                        <h3>💳 Pay for More Eggs</h3>
+                        <p>You've used all free eggs today. Pay <strong id="ton-price">0.1</strong> TON for <strong id="eggs-pack-size">10</strong> more eggs.</p>
+                        <button class="action-button primary" id="pay-ton-btn">
+                            <span class="button-icon">💎</span>
+                            <span class="button-text">Pay <span id="pay-amount">0.1</span> TON</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="info-section">
-            <div class="info-card">
-                <h3>How it works</h3>
-                <p>Send eggs through @tohatchbot in any chat. Only recipients can hatch your eggs!</p>
+        <!-- Stats Page -->
+        <div class="page" id="stats-page">
+            <div class="page-header">
+                <h2 class="page-title">Statistics</h2>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card hatched-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🐣</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Hatched</div>
+                            <div class="stat-value" id="hatched-count-stats">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-description">Eggs you've hatched</div>
+                </div>
+
+                <div class="stat-card received-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🥚</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Your Eggs</div>
+                            <div class="stat-value" id="my-eggs-count-stats">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-description">Your eggs hatched by others</div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-card">
+                    <h3>📊 Detailed Stats</h3>
+                    <p>Track your egg hatching activity and see how many eggs you've sent and received!</p>
+                </div>
             </div>
         </div>
 
-        <div class="footer">
-            <p>Powered by TON</p>
+        <!-- Info Page -->
+        <div class="page" id="info-page">
+            <div class="page-header">
+                <h2 class="page-title">How it works</h2>
+            </div>
+
+            <div class="info-section">
+                <div class="info-card">
+                    <div class="info-icon">🥚</div>
+                    <h3>Send Eggs</h3>
+                    <p>Use @tohatchbot in any Telegram chat to send eggs to your friends via inline mode.</p>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">🐣</div>
+                    <h3>Hatch Eggs</h3>
+                    <p>Only recipients can hatch the eggs you send. You cannot hatch your own eggs!</p>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">📊</div>
+                    <h3>Track Stats</h3>
+                    <p>View your statistics: how many eggs you've hatched and how many of yours were hatched.</p>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-icon">💎</div>
+                    <h3>TON Payments</h3>
+                    <p>Connect your TON wallet to purchase more eggs when you run out of free ones.</p>
+                </div>
+            </div>
         </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-page="home-page">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Home</span>
+            </button>
+            <button class="nav-item" data-page="stats-page">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Stats</span>
+            </button>
+            <button class="nav-item" data-page="info-page">
+                <span class="nav-icon">ℹ️</span>
+                <span class="nav-label">Info</span>
+            </button>
+        </nav>
     </div>
 
     <script src="app.js"></script>
