@@ -24,17 +24,170 @@ function getUserID() {
     return null;
 }
 
-// API endpoint
-const API_URL = 'https://web-production-11ef2.up.railway.app/api/stats';
+// API endpoint - get from environment or use default
+// For Vercel, this should be set as environment variable
+// Default to Railway URL
+const API_URL = process.env.API_URL || window.API_URL || 'https://web-production-11ef2.up.railway.app/api/stats';
+// Extract base URL - if API_URL ends with /api/stats, remove it
+const BOT_API_URL = API_URL.endsWith('/api/stats') ? API_URL.replace('/api/stats', '') : API_URL.replace('/stats', '');
 
-// Log for debugging
-console.log('API URL:', API_URL);
+// TON Connect
+let tonConnectUI = null;
+let walletAddress = null;
 
-// Load statistics and points
+// Initialize TON Connect
+function initTONConnect() {
+    if (typeof TonConnectUI !== 'undefined') {
+        tonConnectUI = new TonConnectUI({
+            manifestUrl: `${window.location.origin}/tonconnect-manifest.json`,
+            buttonRootId: 'ton-connect-btn'
+        });
+        
+        // Check if wallet is already connected
+        tonConnectUI.connectionRestored.then(() => {
+            const account = tonConnectUI.wallet?.account;
+            if (account) {
+                walletAddress = account.address;
+                console.log('TON wallet connected:', walletAddress);
+                updateUI();
+            }
+        });
+        
+        // Handle wallet connection
+        tonConnectUI.onStatusChange((wallet) => {
+            if (wallet) {
+                walletAddress = wallet.account.address;
+                console.log('TON wallet connected:', walletAddress);
+                updateUI();
+            } else {
+                walletAddress = null;
+                console.log('TON wallet disconnected');
+                updateUI();
+            }
+        });
+    } else {
+        console.error('TON Connect UI not loaded');
+    }
+}
+
+// Check payment status
+async function checkPaymentStatus() {
+    const userId = getUserID();
+    if (!userId) return;
+    
+    try {
+        const response = await fetch(`${BOT_API_URL}/api/ton/payment_info?user_id=${userId}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Payment info:', data);
+            
+            // Show payment section if needed
+            const paymentSection = document.getElementById('payment-section');
+            const tonConnectSection = document.getElementById('ton-connect-section');
+            
+            if (data.needs_payment) {
+                // Update payment info
+                document.getElementById('ton-price').textContent = data.ton_price;
+                document.getElementById('eggs-pack-size').textContent = data.eggs_per_pack;
+                document.getElementById('pay-amount').textContent = data.ton_price;
+                
+                // Show payment section if wallet is connected
+                if (walletAddress) {
+                    paymentSection.style.display = 'block';
+                    tonConnectSection.style.display = 'none';
+                } else {
+                    tonConnectSection.style.display = 'block';
+                    paymentSection.style.display = 'none';
+                }
+            } else {
+                paymentSection.style.display = 'none';
+                tonConnectSection.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error checking payment status:', error);
+    }
+}
+
+// Handle TON payment
+async function handleTONPayment() {
+    const userId = getUserID();
+    if (!userId || !walletAddress) {
+        alert('Please connect your TON wallet first');
+        return;
+    }
+    
+    try {
+        // Get payment info
+        const response = await fetch(`${BOT_API_URL}/api/ton/payment_info?user_id=${userId}`);
+        const paymentInfo = await response.json();
+        
+        if (!paymentInfo.needs_payment) {
+            alert('You don\'t need to pay right now');
+            return;
+        }
+        
+        const amount = paymentInfo.ton_price; // 0.1 TON
+        const wallet = paymentInfo.ton_wallet; // Recipient wallet
+        
+        // Create transaction
+        const transaction = {
+            validUntil: Math.floor(Date.now() / 1000) + 360, // 5 minutes
+            messages: [
+                {
+                    address: wallet,
+                    amount: (amount * 1000000000).toString(), // Convert to nanotons
+                }
+            ]
+        };
+        
+        // Send transaction
+        const result = await tonConnectUI.sendTransaction(transaction);
+        console.log('Transaction result:', result);
+        
+        // Verify payment with backend
+        const verifyResponse = await fetch(`${BOT_API_URL}/api/ton/verify_payment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                tx_hash: result.boc,
+                amount: amount
+            })
+        });
+        
+        const verifyData = await verifyResponse.json();
+        
+        if (verifyResponse.ok && verifyData.success) {
+            alert(`✅ Payment successful! You can now send ${verifyData.eggs_added} more eggs.`);
+            // Reload payment status
+            checkPaymentStatus();
+        } else {
+            alert(`❌ Payment verification failed: ${verifyData.error || 'Unknown error'}`);
+        }
+    } catch (error) {
+        console.error('Error processing payment:', error);
+        alert(`❌ Payment failed: ${error.message}`);
+    }
+}
+
+// Update UI based on wallet connection
+function updateUI() {
+    checkPaymentStatus();
+}
+
+// Load statistics
 async function loadStats() {
     const hatchedCountEl = document.getElementById('hatched-count');
     const myEggsCountEl = document.getElementById('my-eggs-count');
-    const eggPointsEl = document.getElementById('egg-points');
     
     const userId = getUserID();
     
@@ -42,14 +195,12 @@ async function loadStats() {
         console.warn('No user ID found');
         hatchedCountEl.textContent = '0';
         myEggsCountEl.textContent = '0';
-        eggPointsEl.textContent = '0';
         return;
     }
     
     // Show loading
     hatchedCountEl.innerHTML = '<span class="loading"></span>';
     myEggsCountEl.innerHTML = '<span class="loading"></span>';
-    eggPointsEl.innerHTML = '<span class="loading"></span>';
     
     try {
         console.log(`Fetching stats from: ${API_URL}?user_id=${userId}`);
@@ -67,10 +218,6 @@ async function loadStats() {
             console.log('Stats data:', data);
             animateValue(hatchedCountEl, 0, data.hatched_by_me || 0, 1000);
             animateValue(myEggsCountEl, 0, data.my_eggs_hatched || 0, 1000);
-            animateValue(eggPointsEl, 0, data.egg_points || 0, 1000);
-            
-            // Update task status and progress
-            updateTaskStatus(data.tasks || {}, data);
         } else {
             const errorText = await response.text();
             console.error('API error:', response.status, errorText);
@@ -80,61 +227,6 @@ async function loadStats() {
         console.error('Error loading stats:', error);
         hatchedCountEl.textContent = '0';
         myEggsCountEl.textContent = '0';
-        eggPointsEl.textContent = '0';
-    }
-}
-
-// Update task status
-function updateTaskStatus(tasks, data) {
-    // Subscribe task
-    const subscribeButton = document.getElementById('subscribe-button');
-    const subscribeTask = document.getElementById('task-subscribe');
-    
-    if (tasks.subscribed_to_cocoin) {
-        subscribeButton.textContent = 'Subscribed ✓';
-        subscribeButton.classList.add('completed');
-        subscribeButton.disabled = true;
-        subscribeTask.style.opacity = '0.7';
-    }
-    
-    // Hatch 100 egg task
-    const hatch100Button = document.getElementById('hatch-100-button');
-    const hatch100Task = document.getElementById('task-hatch-100');
-    const hatchProgress = document.getElementById('hatch-progress');
-    const hatchedCount = data.hatched_by_me || 0;
-    
-    if (hatchProgress) {
-        hatchProgress.textContent = `${Math.min(hatchedCount, 100)} / 100`;
-    }
-    
-    if (tasks.hatch_100_eggs) {
-        hatch100Button.textContent = 'Completed ✓';
-        hatch100Button.classList.add('completed');
-        hatch100Button.disabled = true;
-        hatch100Task.style.opacity = '0.7';
-    } else {
-        hatch100Button.textContent = 'In Progress';
-        hatch100Button.disabled = true;
-    }
-    
-    // Send 100 egg task
-    const send100Button = document.getElementById('send-100-button');
-    const send100Task = document.getElementById('task-send-100');
-    const sendProgress = document.getElementById('send-progress');
-    const sentCount = data.eggs_sent || 0;
-    
-    if (sendProgress) {
-        sendProgress.textContent = `${Math.min(sentCount, 100)} / 100`;
-    }
-    
-    if (tasks.send_100_eggs) {
-        send100Button.textContent = 'Completed ✓';
-        send100Button.classList.add('completed');
-        send100Button.disabled = true;
-        send100Task.style.opacity = '0.7';
-    } else {
-        send100Button.textContent = 'In Progress';
-        send100Button.disabled = true;
     }
 }
 
@@ -154,121 +246,22 @@ function animateValue(element, start, end, duration) {
     window.requestAnimationFrame(step);
 }
 
-// Handle Send Egg image button
+// Handle Send Egg button
 function setupSendEggButton() {
-    const sendEggImageBtn = document.getElementById('send-egg-image-btn');
-    if (sendEggImageBtn) {
-        sendEggImageBtn.addEventListener('click', () => {
-            // Open inline mode to forward "@tohatchbot egg" to chats
-            tg.switchInlineQuery('@tohatchbot egg', ['users', 'bots', 'groups', 'channels']);
+    const sendEggBtn = document.getElementById('send-egg-btn');
+    if (sendEggBtn) {
+        sendEggBtn.addEventListener('click', () => {
+            // Open inline mode in Telegram
+            tg.openLink('https://t.me/tohatchbot?start=egg', { try_instant_view: false });
         });
     }
 }
 
-// Setup subscribe button
-function setupSubscribeButton() {
-    const subscribeButton = document.getElementById('subscribe-button');
-    if (subscribeButton) {
-        subscribeButton.addEventListener('click', () => {
-            // Open Cocoin channel
-            tg.openTelegramLink('https://t.me/cocoin');
-            
-            // Check subscription after a delay
-            setTimeout(() => {
-                checkSubscription();
-            }, 2000);
-        });
-    }
-}
-
-// Check subscription status
-async function checkSubscription() {
-    const userId = getUserID();
-    if (!userId) return;
-    
-    try {
-        const response = await fetch(`${API_URL.replace('/api/stats', '')}/api/stats/check_subscription?user_id=${userId}`, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-            }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            if (data.subscribed) {
-                // Reload stats to update points
-                loadStats();
-                tg.showAlert('You earned 333 Egg points! 🎉');
-            } else {
-                tg.showAlert('Please subscribe to @cocoin channel first');
-            }
-        }
-    } catch (error) {
-        console.error('Error checking subscription:', error);
-    }
-}
-
-// Navigation
-function setupNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
-    const pages = document.querySelectorAll('.page');
-    
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const targetPage = item.getAttribute('data-page');
-            
-            // Update active nav item
-            navItems.forEach(nav => nav.classList.remove('active'));
-            item.classList.add('active');
-            
-            // Show target page
-            pages.forEach(page => {
-                page.classList.remove('active');
-                if (page.id === `page-${targetPage}`) {
-                    page.classList.add('active');
-                }
-            });
-        });
-    });
-}
-
-// TON Connect
-let tonConnectUI = null;
-
-function setupTONConnect() {
-    const tonConnectBtn = document.getElementById('ton-connect-btn');
-    if (tonConnectBtn && window.TonConnectUI) {
-        try {
-            tonConnectUI = new window.TonConnectUI({
-                manifestUrl: window.location.origin + '/tonconnect-manifest.json',
-                buttonRootId: 'ton-connect-btn'
-            });
-            
-            // Handle connection
-            tonConnectUI.onStatusChange((wallet) => {
-                if (wallet) {
-                    console.log('TON Wallet connected:', wallet);
-                    tonConnectBtn.textContent = 'Connected ✓';
-                    tonConnectBtn.disabled = true;
-                } else {
-                    console.log('TON Wallet disconnected');
-                    tonConnectBtn.textContent = 'Connect TON Wallet';
-                    tonConnectBtn.disabled = false;
-                }
-            });
-        } catch (error) {
-            console.error('TON Connect initialization error:', error);
-            // Fallback: simple button click
-            tonConnectBtn.addEventListener('click', () => {
-                tg.showAlert('TON Connect will be available soon!');
-            });
-        }
-    } else if (tonConnectBtn) {
-        // Fallback if TON Connect UI is not loaded
-        tonConnectBtn.addEventListener('click', () => {
-            tg.showAlert('TON Connect will be available soon!');
-        });
+// Setup payment button
+function setupPaymentButton() {
+    const payBtn = document.getElementById('pay-ton-btn');
+    if (payBtn) {
+        payBtn.addEventListener('click', handleTONPayment);
     }
 }
 
@@ -276,9 +269,15 @@ function setupTONConnect() {
 document.addEventListener('DOMContentLoaded', () => {
     loadStats();
     setupSendEggButton();
-    setupSubscribeButton();
-    setupNavigation();
-    setupTONConnect();
+    setupPaymentButton();
+    
+    // Initialize TON Connect
+    initTONConnect();
+    
+    // Check payment status after a delay to ensure TON Connect is initialized
+    setTimeout(() => {
+        checkPaymentStatus();
+    }, 1000);
     
     // Handle back button
     tg.BackButton.onClick(() => {
@@ -288,5 +287,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Show back button if needed
     if (window.history.length > 1) {
         tg.BackButton.show();
+    }
+    
+    // Check if we need to show payment UI from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('pay') === 'true') {
+        // Show payment section
+        setTimeout(() => {
+            checkPaymentStatus();
+        }, 1500);
     }
 });
